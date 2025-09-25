@@ -174,7 +174,7 @@ function updateResolutionScreen() {
         const result = constructivismScenarios[0].choices.find(c => c.id === gameState.constructivismChoiceId);
         document.querySelector('#resolution-area h2').textContent = `🎉 미션 성공! 구성주의 전략 결과`;
         resolutionMessage.innerHTML = `와, 정말 감사합니다! 제가 가진 고민이 해결되는 것 같아요. 이제 어떻게 공부해야 할지 알 것 같아요!`;
-        resolutionEffect.innerHTML = `당신은 ${result.reward.badge}를 획득했습니다! 다른 사람에게 지식을 설명하고 가르치는 과정을 통해 당신의 지식이 더욱 명료해지는 **'학습 전이 효과'**를 얻었습니다.`;
+        resolutionEffect.innerHTML = `당신은 <strong>${result.reward.badge}</strong>를 획득했습니다! 다른 사람에게 지식을 설명하고 가르치는 과정을 통해 당신의 지식이 더욱 명료해지는 **'학습 전이 효과'**를 얻었습니다.`;
     }
 }
 
@@ -201,6 +201,7 @@ function animateTokenAcquisition(targetButton, amount) {
         const targetX = piggyBankRect.left + piggyBankRect.width / 2; 
         const targetY = piggyBankRect.top + piggyBankRect.height / 2; 
         
+        // 애니메이션 실행
         setTimeout(() => {
             coin.style.transform = `translate(${targetX - startX}px, ${targetY - startY}px) scale(0.5)`;
             coin.style.opacity = 0;
@@ -230,9 +231,11 @@ function updateTokens(amount, targetButton) {
         alert(`❌ 경고: 코인 ${Math.abs(finalAmount)}개가 차감됩니다. 집중력을 유지하세요. (누적: ${gameState.tokens})`);
     }
 
+    // 미션 완료 조건: 5 코인 누적 시
     if (gameState.tokens >= 5) {
         alert(`🎉 행동주의 미션 완료! 5 코인을 모았습니다!`); 
-        gameState.tokens = 0;
+        // 획득한 코인은 사라지고 다음 미션을 위한 초기화 (실제 게임에서라면 보상 교환 후 누적)
+        gameState.tokens = 0; 
         currentTokensDisplay.textContent = gameState.tokens;
         showScreen('resolution-area'); 
     }
@@ -241,6 +244,7 @@ function updateTokens(amount, targetButton) {
 function loadNewBehaviorismTask() {
     currentTasks = [];
     
+    // 무작위로 강화 목표 1개, 처벌 목표 1개 선택
     let reinforceIndex = Math.floor(Math.random() * behaviorismReinforcementTasks.length);
     currentTasks.push(behaviorismReinforcementTasks[reinforceIndex]);
 
@@ -258,6 +262,7 @@ function loadNewBehaviorismTask() {
 function handleTaskClick(taskIndex, button, input) {
     if (!currentTasks[taskIndex]) return; 
 
+    // 인풋 검증 (실천 내용 입력 필수)
     if (input.value.trim() === '') {
         alert("⚠️ 목표를 실천한 내용을 입력해야 코인을 획득/차감할 수 있습니다.");
         return;
@@ -265,6 +270,7 @@ function handleTaskClick(taskIndex, button, input) {
 
     updateTokens(currentTasks[taskIndex].value, button);
 
+    // 새 목표 로드
     if (missionArea.style.display === 'block') {
         input.value = '';
         loadNewBehaviorismTask();
@@ -299,8 +305,12 @@ let draggedPiece = null;
 function loadCognitivismMission() {
     gameState.correctCognitivismDrops = 0;
     
+    // 기존에 드롭존에 남아있는 조각들 초기화
+    document.querySelectorAll('.drop-zone').forEach(zone => zone.innerHTML = '<h4>' + zone.dataset.category + '</h4>');
+    
     // 조각 초기화 및 생성
     puzzlePiecesContainer.innerHTML = '';
+    // 조각들을 무작위로 섞음
     const shuffledPieces = [...cognitivismPieces].sort(() => Math.random() - 0.5);
 
     shuffledPieces.forEach(pieceData => {
@@ -308,7 +318,7 @@ function loadCognitivismMission() {
         piece.classList.add('puzzle-piece');
         piece.textContent = pieceData.name;
         piece.setAttribute('draggable', 'true');
-        piece.dataset.category = pieceData.category;
+        piece.dataset.category = pieceData.category; // 정답 카테고리 저장
         piece.id = pieceData.id;
         puzzlePiecesContainer.appendChild(piece);
     });
@@ -328,7 +338,7 @@ function handleDragStart(e) {
 }
 
 function handleDragOver(e) {
-    e.preventDefault(); // 드롭을 허용
+    e.preventDefault(); 
     e.target.closest('.drop-zone')?.classList.add('drag-over');
 }
 
@@ -343,22 +353,23 @@ function handleDrop(e) {
 
     dropZone.classList.remove('drag-over');
     
-    // 1. 카테고리 일치 확인
     const pieceId = e.dataTransfer.getData('text/plain');
     const piece = document.getElementById(pieceId);
+    
+    // 드래그 시작 시 투명도 되돌리기
+    piece.style.opacity = '1';
 
+    // 1. 카테고리 일치 확인
     if (piece.dataset.category === dropZone.dataset.category) {
         // 정답 처리
         piece.classList.remove('puzzle-piece');
         piece.classList.add('dropped-piece');
         piece.setAttribute('draggable', 'false');
-        piece.style.opacity = '1';
-        piece.style.transform = 'none';
         
         dropZone.appendChild(piece);
         gameState.correctCognitivismDrops++;
         
-        // 미션 완료 확인
+        // 미션 완료 확인 (총 12개 조각)
         if (gameState.correctCognitivismDrops === gameState.totalCognitivismPieces) {
             alert("🎉 모든 개념을 올바르게 연결했습니다! 기억의 방 탈출 성공!");
             showScreen('resolution-area');
@@ -366,8 +377,8 @@ function handleDrop(e) {
 
     } else {
         // 오답 처리 (원래 위치로 복귀)
-        piece.style.opacity = '1';
         alert("🚨 틀린 개념입니다! 다시 생각해 보세요. (조각이 제자리로 돌아갑니다)");
+        // HTML 구조상 원래 위치(puzzle-pieces-container)에 조각이 남아있으므로, 별도의 이동 코드는 필요 없음.
     }
 }
 
@@ -415,10 +426,10 @@ function handleScaffoldingChoice(choiceId) {
     // 결과 저장을 위해 선택 ID 저장
     gameState.constructivismChoiceId = choiceId;
     
-    // 미션 완료 버튼 이벤트 연결 (한 번만 클릭 가능하도록)
+    // 미션 완료 버튼 이벤트 연결
     completeMentorMissionButton.onclick = () => {
         showScreen('resolution-area');
-        completeMentorMissionButton.onclick = null; // 이벤트 제거
+        completeMentorMissionButton.onclick = null;
     };
 }
 
@@ -453,7 +464,6 @@ function startMission(strategy) {
 // 7. 이벤트 리스너 연결
 // --------------------------------------------------
 
-// 초기화 함수
 function initializeGame() {
     // 🚀 전문가 말풍선 고정 메시지 설정
     expertBubbles.behaviorism.textContent = "학습은 자극과 반응 행동을 연결하는 과정입니다. 집중력이 문제라면, 보상으로 학습 습관을 만들어 보세요! 목표를 달성할 때마다 포인트를 드릴게요!";
@@ -523,5 +533,5 @@ exchangeButtons.forEach(button => {
 });
 
 
-// 8. 페이지 로드 시 초기화
-window.onload = initializeGame;
+// 8. 페이지 로드 시 초기화 (성능 개선을 위해 DOMContentLoaded 사용)
+document.addEventListener('DOMContentLoaded', initializeGame);
