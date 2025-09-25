@@ -1,19 +1,13 @@
-<!DOCTYPE html>
-<html lang="ko">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>교육 전략 게임 시연 자료</title>
-    <link rel="stylesheet" href="css/style.css">
-</head>
-<body>
-    <div id="game-container">
-        <h1>교육 전략 시뮬레이션</h1>
-        
-        <div id="setup-area">
+<div id="setup-area">
             <p>게임 시나리오 이름을 입력하세요:</p>
-            <input type="text" id="scenario-name" placeholder="예: 4차 산업혁명 시대 인재 양성">
+            <input type="text" id="scenario-name" placeholder="예: 학습의 원리와 방법">
             <button id="start-button">게임 시작</button>
+        </div>
+
+        <div id="game-area" style="display: none;">
+            <h2>게임을 시작합니다!</h2>
+            <p id="current-scenario">현재 시나리오: [시나리오 이름]</p>
+            <p>여기에 게임 턴, 자원, 전략 선택지가 표시됩니다.</p>
         </div>
         </div>
     <script src="js/game.js"></script>
