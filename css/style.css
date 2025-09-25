@@ -1,0 +1,28 @@
+/* css/style.css */
+body {
+    margin: 0;
+    padding: 0;
+    background-color: #f4f4f4; /* 배경색을 밝은 회색으로 변경 */
+    font-family: sans-serif;
+    display: flex;
+    justify-content: center; /* 내용을 가로 가운데 정렬 */
+    align-items: center; /* 내용을 세로 가운데 정렬 */
+    min-height: 100vh; /* 화면 전체 높이 사용 */
+}
+
+#game-container {
+    width: 90%;
+    max-width: 800px; /* 최대 너비 제한 */
+    background-color: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    text-align: center;
+}
+
+h1 {
+    color: #333;
+    border-bottom: 2px solid #ccc;
+    padding-bottom: 10px;
+    margin-top: 0;
+}
