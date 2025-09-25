@@ -55,16 +55,11 @@
                 </div>
 
                 <div id="mission-content">
-                    <h4>오늘의 학습 목표를 선택하세요.</h4>
+                    <h4>오늘의 학습 목표를 선택하세요. (버튼 클릭 시 새로운 목표 등장)</h4>
                     
-                    <div class="choice-card correct-choice" data-reward="1">
-                        <p>✅ **단어 10개 외우기**</p>
-                        <button class="action-button" data-action="confirm">목표 달성 확인</button>
-                    </div>
-                    
-                    <div class="choice-card wrong-choice" data-penalty="-1">
-                        <p>❌ **공부 중 스마트폰 5분 보기**</p>
-                        <button class="action-button" data-action="start">시작하기</button>
+                    <div id="dynamic-task-card" class="choice-card">
+                        <p id="task-text">[여기에 학습 목표가 표시됩니다.]</p>
+                        <button id="task-action-button" class="action-button">행동 확인</button>
                     </div>
                 </div>
                 

@@ -5,6 +5,23 @@ let gameState = {
     tokens: 0, // 집중력 코인 초기값
 };
 
+// 🚀 [새로 추가] 행동주의 미션 목록 (랜덤으로 선택됨)
+const behaviorismTasks = [
+    // 강화 (Reinforcement)
+    { title: "수학 문제 5개 풀기", type: "reinforce", value: 1, action: "목표 달성 확인" },
+    { title: "교과서 20분 집중해서 읽기", type: "reinforce", value: 1, action: "목표 달성 확인" },
+    { title: "오늘 배운 개념 3가지 요약하기", type: "reinforce", value: 2, action: "목표 달성 확인" },
+    { title: "스터디 그룹 모임 시간에 맞춰 참석하기", type: "reinforce", value: 1, action: "목표 달성 확인" },
+    // 처벌 (Punishment)
+    { title: "공부 중 SNS 알림 확인", type: "punish", value: -1, action: "시작하기" },
+    { title: "숙제를 미루고 게임하기", type: "punish", value: -2, action: "시작하기" },
+    { title: "책상 정리 안 하고 공부 시작하기", type: "punish", value: -1, action: "시작하기" },
+    { title: "시험 전날 밤샘 공부 시도 (비효율적 행동)", type: "punish", value: -1, action: "시작하기" },
+];
+
+// 현재 미션 상태를 저장할 변수
+let currentTask = null; 
+
 // 🚀 [수정] 전략 이름을 한국어로 변환하기 위한 지도
 const strategyMap = {
     'behaviorism': '행동주의',
@@ -20,10 +37,12 @@ const experts = document.querySelectorAll('.expert');
 const missionArea = document.getElementById('mission-area');
 const abandonMissionButton = document.getElementById('abandon-mission-button');
 
-// 🚀 [새로 추가] 행동주의 미션 관련 요소 가져오기
+// 🚀 [새로 추가] 행동주의 미션 관련 요소 가져오기 (동적 카드 포함)
 const behaviorismMission = document.getElementById('behaviorism-mission');
 const currentTokensDisplay = document.getElementById('current-tokens');
-const actionButtons = document.querySelectorAll('#behaviorism-mission .action-button');
+const dynamicTaskCard = document.getElementById('dynamic-task-card');
+const taskText = document.getElementById('task-text');
+const taskActionButton = document.getElementById('task-action-button');
 
 
 // 2. 상태 관리 함수: 원하는 화면만 보이게 하고 나머지는 숨깁니다.
@@ -47,6 +66,25 @@ function updateTokens(amount) {
         alert(`✅ 목표 달성! 집중력 코인 ${amount}개를 획득했습니다! (누적: ${gameState.tokens})`);
     } else if (amount < 0) {
         alert(`❌ 경고: 코인 ${Math.abs(amount)}개가 차감됩니다. 집중력을 유지하세요. (누적: ${gameState.tokens})`);
+    }
+}
+
+// 🚀 [새로 추가] 새로운 행동주의 미션을 로드하는 함수
+function loadNewBehaviorismTask() {
+    // 1. 미션 풀에서 랜덤으로 하나의 미션을 선택합니다.
+    const randomIndex = Math.floor(Math.random() * behaviorismTasks.length);
+    currentTask = behaviorismTasks[randomIndex];
+    
+    // 2. HTML 요소 업데이트
+    taskText.textContent = currentTask.title;
+    taskActionButton.textContent = currentTask.action;
+    
+    // 3. 카드 스타일 업데이트 (강화/처벌에 따른 색상 변경)
+    dynamicTaskCard.classList.remove('correct-choice', 'wrong-choice');
+    if (currentTask.type === 'reinforce') {
+        dynamicTaskCard.classList.add('correct-choice');
+    } else {
+        dynamicTaskCard.classList.add('wrong-choice');
     }
 }
 
@@ -90,25 +128,30 @@ function startMission(strategy) {
     // 행동주의 미션만 표시
     if (strategy === 'behaviorism') {
         behaviorismMission.style.display = 'block';
+        // 🌟 [수정] 미션 시작 시 첫 미션을 로드합니다.
+        loadNewBehaviorismTask(); 
     }
     
     // (다른 미션 로직은 이 if/else if 블록에 추가될 예정입니다)
 }
 
 
-// 5. 🚀 [새로 추가] 행동주의 미션 버튼 클릭 이벤트 연결
-actionButtons.forEach(button => {
-    button.addEventListener('click', (event) => {
-        const card = event.target.closest('.choice-card'); // 상위 카드 요소 찾기
-        
-        if (card.classList.contains('correct-choice')) {
-            const reward = parseInt(card.getAttribute('data-reward'));
-            updateTokens(reward); // 강화 (토큰 획득)
-        } else if (card.classList.contains('wrong-choice')) {
-            const penalty = parseInt(card.getAttribute('data-penalty'));
-            updateTokens(penalty); // 처벌 (토큰 차감)
-        }
-    });
+// 5. 🚀 [수정] 행동주의 미션 버튼 클릭 이벤트 연결 (동적 내용 변경)
+taskActionButton.addEventListener('click', () => {
+    if (!currentTask) return; 
+
+    // 1. 토큰 업데이트 (현재 로드된 미션의 value 사용)
+    updateTokens(currentTask.value);
+    
+    // 2. 🌟 새로운 미션 로드 (화면 내용 변경)
+    loadNewBehaviorismTask();
+
+    // 🌟 5 코인 모으면 미션 완료 처리 (요청 사항)
+    if (gameState.tokens >= 5) {
+        // 미션 완료 메시지 출력
+        alert(`🎉 미션 완료! 5 코인을 모았습니다!`); 
+        // 미션 완료 화면으로 전환 로직 (다음 단계에서 구체화)
+    }
 });
 
 

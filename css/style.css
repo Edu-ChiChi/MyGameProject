@@ -122,7 +122,7 @@ h1 {
 #token-display {
     font-size: 1.5em;
     font-weight: bold;
-    color: #ff9800; /* 오렌지색 코인 표시 */
+    color: #ff9800;
     margin: 20px 0;
     padding: 10px;
     border: 2px solid #ff9800;
@@ -147,6 +147,7 @@ h1 {
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 }
 
+/* 동적 카드 스타일 */
 .correct-choice {
     border-left: 5px solid #4CAF50; /* 강화: 녹색 */
 }
@@ -158,11 +159,11 @@ h1 {
 .choice-card p {
     font-size: 1.1em;
     font-weight: 500;
-    margin-bottom: 10px;
+    margin-bottom: 15px;
     color: #333;
 }
 
-.action-button {
+#task-action-button {
     padding: 8px 20px;
     border: none;
     border-radius: 4px;
@@ -171,15 +172,17 @@ h1 {
     transition: background-color 0.2s;
 }
 
-.correct-choice .action-button {
+/* 버튼 색상은 .correct-choice나 .wrong-choice에 따라 동적으로 설정됩니다. */
+.correct-choice #task-action-button {
     background-color: #4CAF50;
     color: white;
 }
 
-.wrong-choice .action-button {
+.wrong-choice #task-action-button {
     background-color: #f44336;
     color: white;
 }
+
 
 /* --- 라이선스 푸터 스타일 --- */
 #license-footer {
