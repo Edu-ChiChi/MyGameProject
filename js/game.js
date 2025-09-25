@@ -7,18 +7,18 @@ let gameState = {
 
 // 🚀 행동주의 미션 목록 (강화/처벌을 분리하여 관리)
 const behaviorismReinforcementTasks = [
-    { id: 1, title: "단어 10개 외우기", value: 1, action: "목표 달성 확인" },
+    { id: 1, title: "영어 단어 10개 외우기", value: 1, action: "목표 달성 확인" },
     { id: 2, title: "수학 문제 3개 풀기", value: 1, action: "목표 달성 확인" },
     { id: 3, title: "교과서 10분 읽기", value: 1, action: "목표 달성 확인" },
-    { id: 4, title: "오늘 배운 개념 3가지 요약하기", value: 2, action: "목표 달성 확인" },
+    { id: 4, title: "오늘 학교에서 배운 개념 3가지 요약하기", value: 1, action: "목표 달성 확인" },
     { id: 5, title: "스터디 그룹 모임 시간에 맞춰 참석하기", value: 1, action: "목표 달성 확인" },
 ];
 
 const behaviorismPunishmentTasks = [
     { id: 101, title: "공부 중 SNS 알림 확인", value: -1, action: "시작하기" },
-    { id: 102, title: "숙제를 미루고 게임하기", value: -2, action: "시작하기" },
+    { id: 102, title: "숙제를 미루고 게임하기", value: -1, action: "시작하기" },
     { id: 103, title: "책상 정리 안 하고 공부 시작하기", value: -1, action: "시작하기" },
-    { id: 104, title: "시험 전날 밤샘 공부 시도 (비효율적 행동)", value: -1, action: "시작하기" },
+    { id: 104, title: "이전까지 게임하다가 시험 직전날 몰아서 공부하기", value: -1, action: "시작하기" },
 ];
 
 // 현재 로드된 두 미션을 저장할 변수
