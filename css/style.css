@@ -1,4 +1,4 @@
-/* css/style.css (전체 내용 교체) */
+/* css/style.css (전체 내용) */
 body {
     margin: 0;
     padding: 0;
@@ -81,11 +81,15 @@ h1 {
     transform: translateY(-5px);
 }
 
+/* 텍스트 아이콘 스타일링 (최종) */
 .expert-icon {
-    display: block;
+    font-size: 4em; /* 아이콘 크기 확대 */
+    line-height: 1;
+    text-align: center;
+    display: block; /* 중앙 정렬을 위해 block으로 설정 */
     margin: 15px auto;
-    border-radius: 50%;
-    border: 4px solid #ccc;
+    border: none !important; 
+    border-radius: 50%; 
     width: 100px;
     height: 100px;
 }

@@ -1,4 +1,11 @@
-// js/game.js (전체 내용 교체)
+// js/game.js (전체 내용)
+
+// 🚀 전략 이름을 한국어로 변환하기 위한 지도 (수정 사항)
+const strategyMap = {
+    'behaviorism': '행동주의',
+    'cognitivism': '인지주의',
+    'constructivism': '구성주의'
+};
 
 // 1. HTML 요소 가져오기
 const initialProblemArea = document.getElementById('initial-problem-area');
@@ -45,8 +52,12 @@ abandonMissionButton.addEventListener('click', () => {
 // 4. 미션 시작 함수 (선택된 전략에 따라 화면 전환)
 function startMission(strategy) {
     showScreen('mission-area');
-    // 선택된 전략 이름으로 미션 제목을 설정합니다.
-    missionArea.querySelector('h2').textContent = `선택한 전략: [${strategy}] 미션 진행 중...`;
+    
+    // 🌟 수정 완료: strategyMap을 이용해 한글 이름을 가져옵니다.
+    const koreanName = strategyMap[strategy] || strategy; 
+    
+    // 한글 이름으로 미션 제목을 설정합니다.
+    missionArea.querySelector('h2').textContent = `선택한 전략: [${koreanName}] 미션 진행 중...`;
     
     // 이 단계에서는 미션 진행 화면으로만 전환됩니다.
 }
