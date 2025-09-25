@@ -12,23 +12,34 @@
         
         <div id="initial-problem-area">
             <h2>고민 제시</h2>
-            <p>공부가 너무 막막하고 지루해요. 어디서부터 어떻게 시작해야 할지 모르겠고, 집중력도 금방 떨어져요.</p>
+            <p>"안녕하세요, 저는 상명고등학교 1학년 학생입니다. 곧 기말고사가 다가오는데, 공부할 내용이 너무 많아서 어디서부터 시작해야 할지 모르겠어요. 혼자서 밤새도록 책상에 앉아 있어도 집중이 잘 안 되고, 성적도 오르지 않아서 너무 막막합니다. 그래서 친구들과 함께 스터디를 해보려고 했는데, 무엇을 어떻게 해야 할지 모르겠어요."</p>
             <button id="consult-button" class="action-button">고민 상담해주기</button>
+            
+            <div id="copyright-notice" class="faded-text">
+                본 교육 자료는 교육의이해 교과목의 수업 시연을 위해 상명대학교 교육학과 재학생이 순수 기획/제작한 비영리 교육 자료입니다.<br>
+                또한 본 자료는 [CC BY-NC] 조건 하에 공유가능하며, 재배포 시 반드시 출처와 비영리 교육 자료임을 명시해야 합니다.
+            </div>
         </div>
 
         <div id="expert-selection-area" style="display: none;">
             <h2>어떤 전문가에게 상담을 받을까요?</h2>
-            <p>학습 전문가의 전략을 선택하여 미션을 시작해보세요.</p>
+            
             <div id="expert-list">
                 <div class="expert" data-strategy="behaviorism">
+                    <div class="speech-bubble behaviorism-bubble">
+                        </div>
                     <img src="images/behaviorism.png" alt="행동주의 전문가" class="expert-image"> 
                     <p>행동주의 전문가 (스키너)</p>
                 </div>
                 <div class="expert" data-strategy="cognitivism">
+                    <div class="speech-bubble cognitivism-bubble">
+                        </div>
                     <img src="images/cognitivism.png" alt="인지주의 전문가" class="expert-image"> 
                     <p>인지주의 전문가 (피아제)</p>
                 </div>
                 <div class="expert" data-strategy="constructivism">
+                    <div class="speech-bubble constructivism-bubble">
+                        </div>
                     <img src="images/constructivism.png" alt="구성주의 전문가" class="expert-image"> 
                     <p>구성주의 전문가 (비고츠키)</p>
                 </div>
@@ -37,7 +48,7 @@
 
         <div id="mission-area" style="display: none;">
             <h2>선택하신 전략 미션 진행 중...</h2>
-
+            
             <div id="behaviorism-mission" class="mission-screen" style="display: none;">
                 <h3>행동주의 미션: 습관의 저금통 💰</h3>
                 
@@ -77,6 +88,8 @@
                 <p class="mission-guide">"기억의 방에 갇혔어요! 흩어진 조각들을 연결해서 완전한 개념을 만들어야 탈출할 수 있습니다. 먼저 비슷한 것끼리 묶어볼까요?"</p>
                 
                 <div id="puzzle-area">
+                    <p class="guide-text-dnd">흩어진 조각들을 마우스로 드래그하여 올바른 빈칸에 놓으세요.</p>
+                    
                     <div id="puzzle-pieces-container">
                         </div>
 
@@ -94,14 +107,39 @@
                 </div>
             </div>
             
-            <button id="abandon-mission-button">다른 전략 체험하기 (포기)</button>
+            <div id="constructivism-mission" class="mission-screen" style="display: none;">
+                <h3>구성주의 미션: 지식 공유 멘토 🧑‍🤝‍🧑</h3>
+                
+                <div id="mentor-scenario">
+                    
+                    <div id="mentee-area">
+                        <span id="mentee-character">고민하는 친구</span>
+                        <div id="mentee-dialogue" class="dialogue-box">
+                            </div>
+                    </div>
+
+                    <div id="scaffolding-choices">
+                        </div>
+                    
+                    <div id="mentor-result-message" class="result-box" style="display: none; margin-top: 20px;">
+                        <h4>멘티의 반응:</h4>
+                        <p id="mentee-reaction-text"></p>
+                    </div>
+                </div>
+                
+                <div id="mentor-reward-area" style="margin-top: 30px; display: none;">
+                    <p class="final-message">획득 보상: <span id="mentor-badge" class="highlight-text"></span> (<span id="mentor-points" class="highlight-text"></span> 포인트)</p>
+                    <button id="complete-mentor-mission" class="action-button">미션 완료 및 결과 보기</button>
+                </div>
+            </div>
+            <button id="abandon-mission-button" class="action-button small-button">다른 전략 체험하기 (포기)</button>
         </div>
         
         <div id="resolution-area" style="display: none;">
             <h2>🎉 미션 성공!</h2>
             <div class="result-box">
-                <p>와, 정말 감사합니다! <strong>'습관의 저금통'</strong>을 체험해 보니 공부가 막막하게 느껴졌던 이유를 알 것 같아요. 작은 목표부터 보상을 받으면서 시작하는 방법을 알았으니, 이제 집중해서 공부할 수 있을 것 같아요!</p>
-                <p class="final-message">칭찬과 보상을 통해 '공부 습관'이라는 긍정적 행동이 강화되었습니다. 이제 혼자서도 집중력을 유지하고 목표를 달성할 수 있을 거예요!</p>
+                <p id="resolution-message"></p>
+                <p class="final-message" id="resolution-effect"></p>
                 <button id="restart-button" class="action-button">다른 전략 전문가 만나러 가기</button>
             </div>
         </div>
