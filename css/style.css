@@ -42,6 +42,7 @@ h1 {
     font-size: 1.1em;
 }
 
+/* 🚀 버튼 스타일 통합 (abandon, consult, restart) */
 #consult-button, #abandon-mission-button, #restart-button {
     padding: 12px 30px;
     background-color: #007bff;
@@ -167,6 +168,8 @@ h1 {
     font-weight: 500;
     margin-bottom: 15px;
     color: #333;
+    /* 🌟 글자 잘림 방지 */
+    min-height: 40px; 
 }
 
 .action-button {
@@ -200,16 +203,16 @@ h1 {
     }
 }
 
-/* 🚀 [새로 추가] 해결 화면 스타일 */
+/* 🚀 해결 화면 스타일 */
 #resolution-area {
     padding: 30px;
-    background-color: #e8f5e9; /* 연한 녹색 배경 */
+    background-color: #e8f5e9;
     border-radius: 12px;
     border: 2px solid #4CAF50;
 }
 
 #resolution-area h2 {
-    color: #388e3c; /* 진한 녹색 제목 */
+    color: #388e3c;
     margin-bottom: 20px;
     font-size: 2em;
 }
