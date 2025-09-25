@@ -24,25 +24,54 @@
                     <div class="speech-bubble">
                         "학습은 자극과 반응 행동을 연결하는 과정입니다. 집중력이 문제라면, 보상으로 학습 습관을 만들어 보세요! 목표를 달성할 때마다 포인트를 드릴게 게요!"
                     </div>
-                    <span class="expert-icon">🥇</span> <p>행동주의 전문가</p>
+                    <span class="expert-icon">🥇</span>
+                    <p>행동주의 전문가</p>
                 </div>
                 <div class="expert" data-strategy="cognitivism">
                     <div class="speech-bubble">
                         "학습은 이미 아는 정보를 새로운 정보와 연결하는 과정입니다. 방대한 양이 고민이라면, 효율적인 정리가 필요합니다! 정보를 머릿속에 체계적으로 저장하는 법을 알려드릴게요!"
                     </div>
-                    <span class="expert-icon">🧠</span> <p>인지주의 전문가</p>
+                    <span class="expert-icon">🧠</span>
+                    <p>인지주의 전문가</p>
                 </div>
                 <div class="expert" data-strategy="constructivism">
                     <div class="speech-bubble">
                         "학습은 학생 스스로 중요하다고 생각하는 내용을 자기 방식대로 이해하는 과정입니다. 혼자서 힘들다면, 협력의 힘을 빌려보세요! 친구와 함께 배우는 방법을 알려드릴게요."
                     </div>
-                    <span class="expert-icon">🤝</span> <p>구성주의 전문가</p>
+                    <span class="expert-icon">🤝</span>
+                    <p>구성주의 전문가</p>
                 </div>
             </div>
         </div>
 
         <div id="mission-area" style="display: none;">
             <h2>선택하신 전략 미션 진행 중...</h2>
+
+            <div id="behaviorism-mission" class="mission-screen" style="display: none;">
+                <h3>행동주의 미션: 습관의 저금통 💰</h3>
+                
+                <div id="token-display">
+                    현재 집중력 코인: <span id="current-tokens">0</span>개
+                </div>
+
+                <div id="mission-content">
+                    <h4>오늘의 학습 목표를 선택하세요.</h4>
+                    
+                    <div class="choice-card correct-choice" data-reward="1">
+                        <p>✅ **단어 10개 외우기**</p>
+                        <button class="action-button" data-action="confirm">목표 달성 확인</button>
+                    </div>
+                    
+                    <div class="choice-card wrong-choice" data-penalty="-1">
+                        <p>❌ **공부 중 스마트폰 5분 보기**</p>
+                        <button class="action-button" data-action="start">시작하기</button>
+                    </div>
+                </div>
+                
+                <div id="exchange-popup" style="display: none;">
+                    <p>코인 교환소 팝업 (다음 단계에서 구현)</p>
+                </div>
+            </div>
             <button id="abandon-mission-button">다른 전략 체험하기</button>
         </div>
         
@@ -52,6 +81,7 @@
         본 교육 자료는 교육의이해 교과목의 수업 시연을 위해 상명대학교 교육학과 재학생이 순수 기획/제작한 비영리 교육 자료입니다.<br>
         또한 본 자료는 **[CC BY-NC]** 조건 하에 공유가능하며, 재배포 시 반드시 출처와 비영리 교육 자료임을 명시해야 합니다.
     </footer>
+
     <script src="js/game.js"></script>
 </body>
 </html>
