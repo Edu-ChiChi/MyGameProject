@@ -1,33 +1,57 @@
-// js/game.js
+// js/game.js (전체 내용 교체)
 
-// 1. 필요한 HTML 요소들을 가져옵니다. (id를 이용해 요소를 찾습니다)
-const setupArea = document.getElementById('setup-area');
-const gameArea = document.getElementById('game-area');
-const startButton = document.getElementById('start-button');
-const scenarioInput = document.getElementById('scenario-name');
-const currentScenarioDisplay = document.getElementById('current-scenario');
+// 1. HTML 요소 가져오기
+const initialProblemArea = document.getElementById('initial-problem-area');
+const consultButton = document.getElementById('consult-button');
+const expertSelectionArea = document.getElementById('expert-selection-area');
+const experts = document.querySelectorAll('.expert'); // 모든 전문가 아이콘
+const missionArea = document.getElementById('mission-area');
+const abandonMissionButton = document.getElementById('abandon-mission-button');
 
-
-// 2. [게임 시작] 버튼을 눌렀을 때 실행될 함수를 정의합니다.
-function startGame() {
-    // 입력된 시나리오 이름을 가져옵니다.
-    const scenarioName = scenarioInput.value.trim();
-
-    // 🌟 입력 값이 비어있는지 확인 (교육적인 목적: 필수 정보 입력 유도)
-    if (scenarioName === "") {
-        alert("시나리오 이름을 입력해 주세요!");
-        return; // 입력 값이 없으면 함수 실행 중단
-    }
-
-    // 3. UI 상태를 변경합니다.
-    setupArea.style.display = 'none'; // 설정 화면을 숨깁니다.
-    gameArea.style.display = 'block'; // 게임 화면을 표시합니다.
+// 2. 상태 관리 함수: 원하는 화면만 보이게 하고 나머지는 숨깁니다.
+function showScreen(screenId) {
+    // 모든 화면 숨기기
+    initialProblemArea.style.display = 'none';
+    expertSelectionArea.style.display = 'none';
+    missionArea.style.display = 'none';
     
-    // 시나리오 이름을 게임 화면에 반영합니다.
-    currentScenarioDisplay.textContent = `현재 시나리오: ${scenarioName}`;
-
-    console.log(`게임 시작: ${scenarioName}`);
+    // 요청된 화면 보이기
+    document.getElementById(screenId).style.display = 'block';
 }
 
-// 4. 시작 버튼에 '클릭' 이벤트가 발생하면 startGame 함수를 실행하도록 연결합니다.
-startButton.addEventListener('click', startGame);
+// 3. 이벤트 핸들러 정의
+// 3-1. [고민 상담해주기] 버튼 클릭 시 -> 전문가 선택 화면으로 이동
+consultButton.addEventListener('click', () => {
+    showScreen('expert-selection-area');
+});
+
+// 3-2. 전문가 아이콘 클릭 시 -> 미션 진행 화면으로 이동
+experts.forEach(expert => {
+    expert.addEventListener('click', () => {
+        const strategy = expert.getAttribute('data-strategy'); // 행동주의, 인지주의, 구성주의 중 선택된 값
+        startMission(strategy);
+    });
+});
+
+// 3-3. 미션 포기 버튼 클릭 시 (미션 중 '다른 전략 체험하기')
+abandonMissionButton.addEventListener('click', () => {
+    // 미션 진행 중 확인 메시지 띄우기
+    if (confirm("현재 진행 중인 미션을 포기하시겠어요? 진행 상황은 저장되지 않습니다.")) {
+        showScreen('expert-selection-area'); // 전문가 선택 화면으로 돌아가기
+    }
+});
+
+
+// 4. 미션 시작 함수 (선택된 전략에 따라 화면 전환)
+function startMission(strategy) {
+    showScreen('mission-area');
+    // 선택된 전략 이름으로 미션 제목을 설정합니다.
+    missionArea.querySelector('h2').textContent = `선택한 전략: [${strategy}] 미션 진행 중...`;
+    
+    // 이 단계에서는 미션 진행 화면으로만 전환됩니다.
+}
+
+// 5. 초기 화면 설정: 페이지 로드 시 초기 고민 화면 표시
+window.onload = () => {
+    showScreen('initial-problem-area');
+};

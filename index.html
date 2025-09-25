@@ -1,15 +1,60 @@
-<div id="setup-area">
-            <p>게임 시나리오 이름을 입력하세요:</p>
-            <input type="text" id="scenario-name" placeholder="예: 학습의 원리와 방법">
-            <button id="start-button">게임 시작</button>
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>교육 전략 게임 시연 자료</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div id="game-container">
+        <h1>교육 전략 시뮬레이션</h1>
+        
+        <div id="initial-problem-area">
+            <p class="student-problem">
+                "안녕하세요, 저는 상명고등학교 1학년 학생입니다. 곧 기말고사가 다가오는데, 공부할 내용이 너무 많아서 어디서부터 시작해야 할지 모르겠어요. 혼자서 밤새도록 책상에 앉아 있어도 집중이 잘 안 되고, 성적도 오르지 않아서 너무 막막합니다. 그래서 친구들과 함께 스터디를 해보려고 했는데, 무엇을 어떻게 해야 할지 모르겠어요."
+            </p>
+            <button id="consult-button">고민 상담해주기</button>
         </div>
 
-        <div id="game-area" style="display: none;">
-            <h2>게임을 시작합니다!</h2>
-            <p id="current-scenario">현재 시나리오: [시나리오 이름]</p>
-            <p>여기에 게임 턴, 자원, 전략 선택지가 표시됩니다.</p>
+        <div id="expert-selection-area" style="display: none;">
+            <h2>고민 해결을 위한 전략 전문가를 선택하세요!</h2>
+            <div id="experts">
+                <div class="expert" data-strategy="behaviorism">
+                    <div class="speech-bubble">
+                        "학습은 자극과 반응 행동을 연결하는 과정입니다. 집중력이 문제라면, 보상으로 학습 습관을 만들어 보세요! 목표를 달성할 때마다 포인트를 드릴게 게요!"
+                    </div>
+                    <img src="https://via.placeholder.com/80?text=행동" alt="행동주의 전문가 아이콘" class="expert-icon">
+                    <p>행동주의 전문가</p>
+                </div>
+                <div class="expert" data-strategy="cognitivism">
+                    <div class="speech-bubble">
+                        "학습은 이미 아는 정보를 새로운 정보와 연결하는 과정입니다. 방대한 양이 고민이라면, 효율적인 정리가 필요합니다! 정보를 머릿속에 체계적으로 저장하는 법을 알려드릴게요!"
+                    </div>
+                    <img src="https://via.placeholder.com/80?text=인지" alt="인지주의 전문가 아이콘" class="expert-icon">
+                    <p>인지주의 전문가</p>
+                </div>
+                <div class="expert" data-strategy="constructivism">
+                    <div class="speech-bubble">
+                        "학습은 학생 스스로 중요하다고 생각하는 내용을 자기 방식대로 이해하는 과정입니다. 혼자서 힘들다면, 협력의 힘을 빌려보세요! 친구와 함께 배우는 방법을 알려드릴게요."
+                    </div>
+                    <img src="https://via.placeholder.com/80?text=구성" alt="구성주의 전문가 아이콘" class="expert-icon">
+                    <p>구성주의 전문가</p>
+                </div>
+            </div>
         </div>
+
+        <div id="mission-area" style="display: none;">
+            <h2>선택하신 전략 미션 진행 중...</h2>
+            <button id="abandon-mission-button">다른 전략 체험하기</button>
         </div>
+        
+    </div>
+
+    <footer id="license-footer">
+        본 교육 자료는 교육의이해 교과목의 수업 시연을 위해 상명대학교 교육학과 재학생이 순수 기획/제작한 비영리 교육 자료입니다.<br>
+        또한 본 자료는 **[CC BY-NC]** 조건 하에 공유가능하며, 재배포 시 반드시 출처와 비영리 교육 자료임을 명시해야 합니다.
+    </footer>
     <script src="js/game.js"></script>
 </body>
 </html>
