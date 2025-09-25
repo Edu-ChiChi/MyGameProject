@@ -29,7 +29,7 @@ const strategyMap = {
     'constructivism': '구성주의'
 };
 
-// 1. HTML 요소 가져오기 (전체 화면 관련)
+// 1. HTML 요소 가져오기
 const initialProblemArea = document.getElementById('initial-problem-area');
 const consultButton = document.getElementById('consult-button');
 const expertSelectionArea = document.getElementById('expert-selection-area');
@@ -37,7 +37,11 @@ const experts = document.querySelectorAll('.expert');
 const missionArea = document.getElementById('mission-area');
 const abandonMissionButton = document.getElementById('abandon-mission-button');
 
-// 🚀 행동주의 미션 관련 요소 가져오기 (두 개의 카드 요소)
+// 🚀 [새로 추가] 해결/결론 화면 요소
+const resolutionArea = document.getElementById('resolution-area');
+const restartButton = document.getElementById('restart-button');
+
+// 행동주의 미션 관련 요소
 const behaviorismMission = document.getElementById('behaviorism-mission');
 const currentTokensDisplay = document.getElementById('current-tokens');
 
@@ -56,6 +60,7 @@ function showScreen(screenId) {
     initialProblemArea.style.display = 'none';
     expertSelectionArea.style.display = 'none';
     missionArea.style.display = 'none';
+    resolutionArea.style.display = 'none'; // 🚀 해결 영역 숨기기 추가
     
     // 요청된 화면 보이기
     document.getElementById(screenId).style.display = 'block';
@@ -73,22 +78,21 @@ function updateTokens(amount) {
         alert(`❌ 경고: 코인 ${Math.abs(amount)}개가 차감됩니다. 집중력을 유지하세요. (누적: ${gameState.tokens})`);
     }
 
-    // 🌟 5 코인 모으면 미션 완료 처리
+    // 🌟 [수정] 5 코인 모으면 미션 완료 처리 및 해결 화면으로 전환
     if (gameState.tokens >= 5) {
         alert(`🎉 미션 완료! 5 코인을 모았습니다! '습관의 저금통' 미션을 성공적으로 마쳤습니다!`); 
         
-        // 미션 완료 시 전문가 선택 화면으로 자동 복귀 및 코인 초기화
-        gameState.tokens = 0;
+        // 미션 완료 시 해결 화면으로 이동
+        gameState.tokens = 0; // 코인 초기화
         currentTokensDisplay.textContent = gameState.tokens;
-        showScreen('expert-selection-area');
+        showScreen('resolution-area'); 
     }
 }
 
 
 // 🚀 새로운 행동주의 미션을 로드하는 함수 (두 개 선택)
 function loadNewBehaviorismTask() {
-    // 1. 미션 풀에서 겹치지 않는 두 개의 미션을 랜덤으로 선택합니다.
-    const availableTasks = [...behaviorismTasks]; // 원본 배열 복사
+    const availableTasks = [...behaviorismTasks]; 
     currentTasks = [];
     
     // 첫 번째 미션 선택
@@ -99,11 +103,9 @@ function loadNewBehaviorismTask() {
     randomIndex = Math.floor(Math.random() * availableTasks.length);
     currentTasks.push(availableTasks.splice(randomIndex, 1)[0]);
     
-    
-    // 2. HTML 요소 업데이트 (카드 1)
+    // 카드 1 업데이트
     taskText1.textContent = currentTasks[0].title;
     taskButton1.textContent = currentTasks[0].action;
-    
     taskCard1.classList.remove('correct-choice', 'wrong-choice');
     if (currentTasks[0].type === 'reinforce') {
         taskCard1.classList.add('correct-choice');
@@ -111,10 +113,9 @@ function loadNewBehaviorismTask() {
         taskCard1.classList.add('wrong-choice');
     }
 
-    // 3. HTML 요소 업데이트 (카드 2)
+    // 카드 2 업데이트
     taskText2.textContent = currentTasks[1].title;
     taskButton2.textContent = currentTasks[1].action;
-    
     taskCard2.classList.remove('correct-choice', 'wrong-choice');
     if (currentTasks[1].type === 'reinforce') {
         taskCard2.classList.add('correct-choice');
@@ -149,6 +150,11 @@ abandonMissionButton.addEventListener('click', () => {
     }
 });
 
+// 🚀 [새로 추가] 해결 화면에서 버튼 클릭 시 전문가 선택 화면으로 복귀
+restartButton.addEventListener('click', () => {
+    showScreen('expert-selection-area');
+});
+
 
 // 4. 미션 시작 함수 (화면 전환 및 미션 로드)
 function startMission(strategy) {
@@ -162,28 +168,25 @@ function startMission(strategy) {
     // 행동주의 미션만 표시
     if (strategy === 'behaviorism') {
         behaviorismMission.style.display = 'block';
-        loadNewBehaviorismTask(); // 두 개의 미션을 로드
+        loadNewBehaviorismTask();
     }
 }
 
 
-// 5. 🚀 행동주의 미션 버튼 클릭 이벤트 연결 (두 버튼 모두 처리)
-
-// 🌟 버튼 클릭 처리 함수
+// 5. 행동주의 미션 버튼 클릭 이벤트 연결
 function handleTaskClick(taskIndex) {
     if (!currentTasks[taskIndex]) return; 
 
-    // 1. 토큰 업데이트 (선택된 미션의 value 사용)
+    // 1. 토큰 업데이트 (이 과정에서 5코인 달성 시 해결 화면으로 전환됨)
     updateTokens(currentTasks[taskIndex].value);
     
-    // 2. 새로운 미션 로드 (화면 내용 변경)
-    loadNewBehaviorismTask();
+    // 2. 해결 화면으로 전환되지 않았으면 (즉, 5코인 미만이면) 새로운 미션 로드
+    if (document.getElementById('mission-area').style.display === 'block') {
+        loadNewBehaviorismTask();
+    }
 }
 
-// 🌟 버튼 1 이벤트 리스너
 taskButton1.addEventListener('click', () => handleTaskClick(0)); 
-
-// 🌟 버튼 2 이벤트 리스너
 taskButton2.addEventListener('click', () => handleTaskClick(1));
 
 
