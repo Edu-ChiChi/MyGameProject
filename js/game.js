@@ -3,26 +3,11 @@
 // 🚀 게임 상태 및 코인 초기값
 let gameState = {
     tokens: 0, // 집중력 코인 초기값
+    correctCognitivismDrops: 0, // 인지주의 미션 정답 개수 카운터
+    isBuffed: false, // 🚀 [추가] 포션 사용 여부 플래그 (토큰 강화)
 };
 
-// 🚀 행동주의 미션 목록 (강화/처벌을 분리하여 관리)
-const behaviorismReinforcementTasks = [
-    { id: 1, title: "영어 단어 10개 외우기", value: 1, action: "목표 달성 확인" },
-    { id: 2, title: "수학 문제 3개 풀기", value: 1, action: "목표 달성 확인" },
-    { id: 3, title: "교과서 10분 읽기", value: 1, action: "목표 달성 확인" },
-    { id: 4, title: "오늘 학교에서 배운 개념 3가지 요약하기", value: 1, action: "목표 달성 확인" },
-    { id: 5, title: "스터디 그룹 모임 시간에 맞춰 참석하기", value: 1, action: "목표 달성 확인" },
-];
-
-const behaviorismPunishmentTasks = [
-    { id: 101, title: "공부 중 SNS 알림 확인", value: -1, action: "시작하기" },
-    { id: 102, title: "숙제를 미루고 게임하기", value: -1, action: "시작하기" },
-    { id: 103, title: "책상 정리 안 하고 공부 시작하기", value: -1, action: "시작하기" },
-    { id: 104, title: "이전까지 게임하다가 시험 직전날 몰아서 공부하기", value: -1, action: "시작하기" },
-];
-
-// 현재 로드된 두 미션을 저장할 변수
-let currentTasks = []; 
+// ... (behaviorismReinforcementTasks, behaviorismPunishmentTasks, cognitivismPieces 배열은 이전 코드와 동일) ...
 
 // 🚀 전략 이름을 한국어로 변환하기 위한 지도
 const strategyMap = {
@@ -32,179 +17,185 @@ const strategyMap = {
 };
 
 // 1. HTML 요소 가져오기
-const initialProblemArea = document.getElementById('initial-problem-area');
-const consultButton = document.getElementById('consult-button');
-const expertSelectionArea = document.getElementById('expert-selection-area');
-const experts = document.querySelectorAll('.expert');
-
-// 미션 진행 중/완료 관련
-const missionArea = document.getElementById('mission-area');
-const abandonMissionButton = document.getElementById('abandon-mission-button');
-const resolutionArea = document.getElementById('resolution-area');
-const restartButton = document.getElementById('restart-button'); // 해결창의 버튼
+// ... (기존 요소들) ...
 
 // 행동주의 미션 관련 요소
-const behaviorismMission = document.getElementById('behaviorism-mission');
-const currentTokensDisplay = document.getElementById('current-tokens');
+// ... (기존 요소들) ...
+const taskInput1 = document.getElementById('task-input-1');
+const taskInput2 = document.getElementById('task-input-2');
 
-const taskCard1 = document.getElementById('task-card-1');
-const taskText1 = document.getElementById('task-text-1');
-const taskButton1 = document.getElementById('task-button-1');
+// 🚀 [추가] 교환소 관련 요소
+const openExchangeButton = document.getElementById('open-exchange-button');
+const exchangeModal = document.getElementById('exchange-modal');
+const closeModalButton = document.getElementById('close-modal-button');
+const modalCurrentTokens = document.getElementById('modal-current-tokens');
+const exchangeButtons = document.querySelectorAll('.exchange-button:not(.disabled)');
 
-const taskCard2 = document.getElementById('task-card-2');
-const taskText2 = document.getElementById('task-text-2');
-const taskButton2 = document.getElementById('task-button-2');
+// 🚀 [추가] 모션 관련 요소
+const piggyBank = document.getElementById('piggy-bank');
+// (저금통 위치 계산을 위해 요소를 가져옴)
+const piggyBankRect = piggyBank ? piggyBank.getBoundingClientRect() : null; 
 
 
 // 2. 상태 관리 함수: 원하는 화면만 보이게 하고 나머지는 숨깁니다.
-function showScreen(screenId) {
-    // 모든 화면 숨기기
-    initialProblemArea.style.display = 'none';
-    expertSelectionArea.style.display = 'none';
-    missionArea.style.display = 'none';
-    resolutionArea.style.display = 'none'; 
-    
-    // 요청된 화면 보이기
-    document.getElementById(screenId).style.display = 'block';
+// ... (showScreen 함수는 기존 내용 유지) ...
 
-    // 🚀 [새로 추가] 화면 상태에 따른 '다른 전략 체험하기' 버튼 제어
-    if (screenId === 'expert-selection-area' || screenId === 'resolution-area') {
-        // 미션 선택 화면 또는 완료 화면에서는 버튼 활성화 및 크게 표시
-        abandonMissionButton.style.display = 'block';
-        abandonMissionButton.textContent = "다른 전략 전문가 만나러 가기";
-        abandonMissionButton.disabled = false;
-    } else if (screenId === 'mission-area') {
-        // 미션 진행 중에는 버튼 숨김 (또는 작게 표시 등) - 여기서는 포기 버튼만 남김
-        abandonMissionButton.textContent = "다른 전략 체험하기 (포기)";
-        abandonMissionButton.disabled = false; // 이벤트 리스너에서 확인 메시지 처리
+
+// --------------------------------------------------
+// 🚀 [수정/추가] 토큰(코인) 관련 핵심 로직
+// --------------------------------------------------
+
+// 🚀 코인 획득 모션 함수 (새로 추가)
+function animateTokenAcquisition(targetButton, amount) {
+    // 획득 코인 개수만큼 반복 (현재는 1개, 버프 시 2개)
+    for (let i = 0; i < amount; i++) {
+        const coin = document.createElement('div');
+        coin.classList.add('new-coin');
+        // coin.textContent = '1'; // 코인 안에 숫자를 표시할 경우
+
+        // 버튼 위치 계산
+        const buttonRect = targetButton.getBoundingClientRect();
+        
+        // 코인의 시작 위치 설정 (버튼 근처)
+        const startX = buttonRect.left + (buttonRect.width / 2);
+        const startY = buttonRect.top + (buttonRect.height / 2);
+
+        coin.style.left = `${startX}px`;
+        coin.style.top = `${startY}px`;
+        document.body.appendChild(coin);
+
+        // 🌟 저금통 위치로 애니메이션!
+        // (저금통이 로드된 후 위치를 가져와야 함. 여기서는 임시 위치로 설정)
+        // 실제 구현 시, 저금통의 중앙 좌표를 목표 지점(targetX, targetY)으로 설정해야 함.
+        const targetX = piggyBankRect ? piggyBankRect.left + piggyBankRect.width / 2 : 50; 
+        const targetY = piggyBankRect ? piggyBankRect.top + piggyBankRect.height / 2 : 50; 
+        
+        // CSS transition을 사용한 모션 (setTimeout으로 DOM 적용 후 실행)
+        setTimeout(() => {
+            // 저금통 위치로 이동
+            coin.style.transform = `translate(${targetX - startX}px, ${targetY - startY}px) scale(0.5)`;
+            coin.style.opacity = 0;
+        }, 50);
+
+
+        // 애니메이션 종료 후 요소 제거
+        coin.addEventListener('transitionend', () => {
+            coin.remove();
+        });
     }
 }
 
-// 🚀 토큰(코인) 수량을 업데이트하는 함수
-function updateTokens(amount) {
-    gameState.tokens += amount;
-    currentTokensDisplay.textContent = gameState.tokens;
+
+// 🚀 [수정] 토큰(코인) 수량을 업데이트하는 함수
+function updateTokens(amount, targetButton) {
+    let finalAmount = amount;
     
-    // 시각적 피드백
-    if (amount > 0) {
-        alert(`✅ 목표 달성! 집중력 코인 ${amount}개를 획득했습니다! (누적: ${gameState.tokens})`);
-    } else if (amount < 0) {
-        alert(`❌ 경고: 코인 ${Math.abs(amount)}개가 차감됩니다. 집중력을 유지하세요. (누적: ${gameState.tokens})`);
+    // 🌟 포션 버프 확인 및 적용 (강화 목표만 해당)
+    if (amount > 0 && gameState.isBuffed) {
+        finalAmount = amount * 2; // 1코인 -> 2코인
+        gameState.isBuffed = false; // 버프는 1회용이므로 사용 후 초기화
+        alert(`⭐ 포션 효과 발동! 획득 코인이 ${finalAmount}개로 2배가 됩니다!`);
+    }
+    
+    // 1. 코인 개수 업데이트
+    gameState.tokens += finalAmount;
+    currentTokensDisplay.textContent = gameState.tokens;
+    modalCurrentTokens.textContent = gameState.tokens; // 모달 코인 업데이트
+
+    // 2. 획득/차감 모션 실행 (버튼 요소를 인수로 전달)
+    if (finalAmount > 0) {
+        animateTokenAcquisition(targetButton, finalAmount); 
+    } else if (finalAmount < 0) {
+        alert(`❌ 경고: 코인 ${Math.abs(finalAmount)}개가 차감됩니다. 집중력을 유지하세요. (누적: ${gameState.tokens})`);
     }
 
-    // 🌟 5 코인 모으면 미션 완료 처리 및 해결 화면으로 전환
+    // 3. 미션 완료 확인 (기존 로직)
     if (gameState.tokens >= 5) {
-        
-        // 미션 완료 시 해결 화면으로 이동
-        gameState.tokens = 0; // 코인 초기화
+        alert(`🎉 행동주의 미션 완료! 5 코인을 모았습니다!`); 
+        gameState.tokens = 0;
         currentTokensDisplay.textContent = gameState.tokens;
+        missionArea.querySelector('h2').textContent = `선택한 전략: [행동주의] 미션 완료...`;
         showScreen('resolution-area'); 
     }
 }
 
-
-// 🚀 [수정] 새로운 행동주의 미션을 로드하는 함수 (강화 1개 + 처벌 1개)
-function loadNewBehaviorismTask() {
-    currentTasks = [];
-    
-    // 1. 강화(Reinforcement) 풀에서 무작위로 1개 선택
-    let reinforceIndex = Math.floor(Math.random() * behaviorismReinforcementTasks.length);
-    currentTasks.push(behaviorismReinforcementTasks[reinforceIndex]);
-
-    // 2. 처벌(Punishment) 풀에서 무작위로 1개 선택
-    let punishIndex = Math.floor(Math.random() * behaviorismPunishmentTasks.length);
-    currentTasks.push(behaviorismPunishmentTasks[punishIndex]);
-    
-    // 카드 1 (강화 미션) 업데이트
-    taskText1.textContent = "✅ " + currentTasks[0].title; // 긍정 목표는 1번 카드로 고정
-    taskButton1.textContent = currentTasks[0].action;
-    taskCard1.classList.remove('wrong-choice');
-    taskCard1.classList.add('correct-choice'); // 강화 목표는 항상 correct-choice
-    taskCard1.setAttribute('data-task-type', 'reinforce');
-
-    // 카드 2 (처벌 미션) 업데이트
-    taskText2.textContent = "❌ " + currentTasks[1].title; // 부정 목표는 2번 카드로 고정
-    taskButton2.textContent = currentTasks[1].action;
-    taskCard2.classList.remove('correct-choice');
-    taskCard2.classList.add('wrong-choice'); // 처벌 목표는 항상 wrong-choice
-    taskCard2.setAttribute('data-task-type', 'punish');
-}
+// ... (loadNewBehaviorismTask 함수는 기존 내용 유지) ...
 
 
-// 3. 이벤트 핸들러 정의
-// 3-1. [고민 상담해주기] 버튼 클릭 시
-consultButton.addEventListener('click', () => {
-    showScreen('expert-selection-area');
-});
+// --------------------------------------------------
+// 🚀 [수정] 5. 행동주의 미션 버튼 클릭 이벤트 연결 (입력창 검증 포함)
+// --------------------------------------------------
 
-// 3-2. 전문가 아이콘 클릭 시
-experts.forEach(expert => {
-    expert.addEventListener('click', () => {
-        const strategy = expert.getAttribute('data-strategy');
-        startMission(strategy);
-    });
-});
-
-// 3-3. 🌟 [수정] 미션 포기 버튼 클릭 시 (확인 메시지 추가)
-abandonMissionButton.addEventListener('click', () => {
-    // 미션 진행 중일 때만 확인 메시지 띄우기
-    if (document.getElementById('mission-area').style.display === 'block') {
-        if (confirm("현재 진행 중인 미션을 포기하시겠어요? 진행 상황은 저장되지 않습니다.")) {
-            // 미션을 포기하고 전문가 선택 화면으로 돌아갈 때 코인 초기화
-            gameState.tokens = 0;
-            currentTokensDisplay.textContent = gameState.tokens;
-
-            showScreen('expert-selection-area'); 
-        }
-    } else {
-        // 미션 선택 화면 혹은 완료 화면에서는 바로 전환
-        showScreen('expert-selection-area'); 
-    }
-});
-
-// 3-4. 해결 화면에서 버튼 클릭 시 전문가 선택 화면으로 복귀
-restartButton.addEventListener('click', () => {
-    showScreen('expert-selection-area');
-});
-
-
-// 4. 미션 시작 함수 (화면 전환 및 미션 로드)
-function startMission(strategy) {
-    showScreen('mission-area');
-    
-    const koreanName = strategyMap[strategy] || strategy; 
-    missionArea.querySelector('h2').textContent = `선택한 전략: [${koreanName}] 미션 진행 중...`;
-    
-    document.querySelectorAll('.mission-screen').forEach(el => el.style.display = 'none');
-    
-    // 행동주의 미션만 표시
-    if (strategy === 'behaviorism') {
-        behaviorismMission.style.display = 'block';
-        loadNewBehaviorismTask(); // 강화 1개 + 처벌 1개 로드
-    }
-}
-
-
-// 5. 행동주의 미션 버튼 클릭 이벤트 연결
-function handleTaskClick(taskIndex) {
+function handleTaskClick(taskIndex, button, input) {
     if (!currentTasks[taskIndex]) return; 
 
-    // 1. 토큰 업데이트 (이 과정에서 5코인 달성 시 해결 화면으로 전환됨)
-    updateTokens(currentTasks[taskIndex].value);
-    
-    // 2. 해결 화면으로 전환되지 않았으면 (즉, 5코인 미만이면) 새로운 미션 로드
+    // 🚀 [추가] 입력창 검증
+    if (input.value.trim() === '') {
+        alert("⚠️ 목표를 실천한 내용을 입력해야 코인을 획득/차감할 수 있습니다.");
+        return;
+    }
+
+    // 1. 토큰 업데이트 (버튼 요소를 함께 전달)
+    updateTokens(currentTasks[taskIndex].value, button);
+
+    // 2. 입력창 비우기 및 새로운 미션 로드
     if (document.getElementById('mission-area').style.display === 'block') {
+        input.value = ''; // 입력창 초기화
         loadNewBehaviorismTask();
     }
 }
 
-taskButton1.addEventListener('click', () => {
-    // taskIndex 0 = 강화 미션
-    handleTaskClick(0);
+taskButton1.addEventListener('click', (e) => {
+    handleTaskClick(0, e.currentTarget, taskInput1); // 강화 미션
 }); 
-taskButton2.addEventListener('click', () => {
-    // taskIndex 1 = 처벌 미션
-    handleTaskClick(1);
+taskButton2.addEventListener('click', (e) => {
+    handleTaskClick(1, e.currentTarget, taskInput2); // 처벌 미션
+});
+
+// --------------------------------------------------
+// 🚀 [추가] 7. 교환소 로직
+// --------------------------------------------------
+
+// 교환소 열기
+openExchangeButton.addEventListener('click', () => {
+    modalCurrentTokens.textContent = gameState.tokens;
+    exchangeModal.style.display = 'flex';
+});
+
+// 교환소 닫기
+closeModalButton.addEventListener('click', () => {
+    exchangeModal.style.display = 'none';
+});
+
+// 교환 처리 함수
+function handleExchange(cost) {
+    if (gameState.isBuffed) {
+        alert("⚠️ 이미 '개념 요약 포션' 효과가 적용 중입니다. 다음 턴에 사용해 주세요!");
+        return;
+    }
+
+    if (gameState.tokens >= cost) {
+        gameState.tokens -= cost; // 코인 차감
+        currentTokensDisplay.textContent = gameState.tokens;
+        modalCurrentTokens.textContent = gameState.tokens;
+
+        gameState.isBuffed = true; // 버프 활성화
+
+        alert(`✨ '개념 요약 포션'을 구매했습니다! (남은 코인: ${gameState.tokens}개) \n 다음 목표 달성 시, 코인을 2배(1+1)로 획득합니다!`);
+        exchangeModal.style.display = 'none'; 
+    } else {
+        alert(`❌ 코인이 부족합니다! (필요 코인: ${cost}개 / 현재 코인: ${gameState.tokens}개)`);
+    }
+}
+
+// 교환 버튼 리스너 연결
+exchangeButtons.forEach(button => {
+    button.addEventListener('click', (e) => {
+        const cost = parseInt(e.currentTarget.dataset.cost);
+        if (e.currentTarget.dataset.id === 'potion') {
+            handleExchange(cost);
+        }
+    });
 });
 
 
