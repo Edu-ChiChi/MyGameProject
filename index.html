@@ -48,36 +48,56 @@
         </section>
 
         <section id="mission-area" class="screen" style="display:none;">
+            <button id="abandon-mission-button" class="action-button tertiary">다른 전략 체험하기 (미션 포기)</button>
             <div class="mission-content">
+                
                 <div id="behaviorism-mission" class="mission-screen" style="display:none;">
                     <h3>습관의 저금통 (행동주의 미션)</h3>
                     <div class="token-economy">
                         <div class="token-display">집중력 코인: <span id="token-count">0</span>개</div>
-                        <button id="open-exchange-button">코인 교환소 열기</button>
-                        <div id="behaviorism-mission-logic">
-                           <p>여기에 단어 외우기/수학 문제 풀기 등 활동 UI가 동적으로 생성됩니다.</p>
-                           <button id="simulate-behaviorism-completion" class="action-button primary">5포인트 획득 및 미션 완료</button>
+                        <button id="open-exchange-button">코인 교환소 열기 (기능 미구현)</button>
+                        <div id="behaviorism-mission-logic" style="margin-top: 20px;">
+                            <p>토큰 경제 시뮬레이션: 5코인을 모아 미션을 완료하세요.</p>
+                            <button class="action-button primary" onclick="alert('✅ 목표 달성! 코인 1개를 획득하고 +1 처리 됩니다.')">단어 10개 외우기 (정답 시뮬)</button>
+                            <button class="action-button danger" onclick="alert('❌ 오답 처리. 코인 1개가 차감 처리 됩니다.')" style="margin-left: 10px;">수학 문제 3개 풀기 (오답 시뮬)</button>
+                           <button id="simulate-behaviorism-completion" class="action-button primary large" style="margin-top: 20px;">5포인트 획득 및 미션 완료 (시뮬레이션)</button>
                         </div>
                     </div>
                 </div>
 
                 <div id="cognitivism-mission" class="mission-screen" style="display:none;">
                     <h3>기억의 방 탈출 (인지주의 미션)</h3>
-                    <p>활동: 개념 조각을 '행동주의', '인지주의', '구성주의' 빈칸으로 드래그하여 옮기세요.</p>
-                    <button id="simulate-cognitivism-completion" class="action-button primary">미션 완료</button>
+                    <p><strong>안내:</strong> 기억의 방에 갇혔어요! 흩어진 조각들을 연결해서 완전한 개념을 만들어야 탈출할 수 있습니다. (드래그 앤 드롭 UI는 시뮬레이션으로 대체됩니다.)</p>
+                    <div class="concept-matching-placeholder">
+                        <p>하단 3개의 빈칸에 12개의 개념 조각을 올바르게 매칭해야 합니다.</p>
+                        <pre>
+- 행동주의: 자극, 반응, 처벌, 토큰 경제
+- 인지주의: 인출, 전이, 부호화, 초인지
+- 구성주의: 동화, 학습자 중심 학습, 비계, 비구조화된 문제
+                        </pre>
+                    </div>
+                    <button id="simulate-cognitivism-completion" class="action-button primary large">미션 완료 (시뮬레이션)</button>
                 </div>
 
                 <div id="constructivism-mission" class="mission-screen" style="display:none;">
                     <h3>지식 공유 멘토 (구성주의 미션)</h3>
-                    <p>고민하는 친구에게 적절한 비계(힌트)를 선택하세요.</p>
+                    <div class="friend-bubble" style="background: #f0f8ff; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
+                        <p><strong>고민하는 친구:</strong> "안녕! 나는 '학습의 원리와 방법' 단원 공부 중인데, 행동주의랑 인지주의가 너무 헷갈려. 개념은 외웠는데 서로 어떻게 다른 건지 모르겠어. 좀 도와줄 수 있을까?"</p>
+                    </div>
+                    <p>친구에게 적절한 **비계(도움)**를 선택하세요:</p>
                     <div class="choice-buttons">
-                        <button id="constructivism-choice-1">선택지 1 (약한 비계)</button>
-                        <button id="constructivism-choice-2">선택지 2 (중간 비계)</button>
-                        <button id="constructivism-choice-3">선택지 3 (강한 비계)</button>
+                        <button id="constructivism-choice-1" class="action-button tertiary">
+                            <strong>(약한 비계)</strong> 두 이론의 핵심 단어만 생각해볼까? 행동주의는 행동에 대한 보상, 인지주의는 인출과 전이라고 생각해봐.
+                        </button>
+                        <button id="constructivism-choice-2" class="action-button tertiary">
+                            <strong>(중간 비계)</strong> 행동주의는 강아지 훈련처럼 외적인 보상이 중요하고, 인지주의는 네가 지식을 정리하는 과정을 스스로 계획하고 점검하고 확인해 조절하여 통제하는 것이 중요해.
+                        </button>
+                        <button id="constructivism-choice-3" class="action-button tertiary">
+                            <strong>(강한 비계)</strong> 행동주의는 '자극과 반응'의 연결을 학습이라고 보는 거야. 인지주의는 '자가 질문법' 등을 활용해 배운 내용에 대해 스스로 점검하여 정답을 인출해 내고, 배운 지식을 문제해결에 활용할 수 있도록 하는거야.
+                        </button>
                     </div>
                 </div>
             </div>
-            <button id="abandon-mission-button" class="action-button tertiary">다른 전략 체험하기 (미션 포기)</button>
         </section>
 
         <section id="resolution-area" class="screen" style="display:none;">
@@ -94,27 +114,27 @@
         <div class="modal-content">
             <button id="close-crossword-modal" class="close-button">X</button>
             <h3>교과서 십자말풀이 미션</h3>
+            <p id="crossword-message">단원의 핵심 개념 9가지를 모두 채워 넣으세요. (총 9문항)</p>
             <div class="crossword-game-area">
                 <div class="crossword-grid-container">
-                    <p class="placeholder-text">8x8 십자말 격자 영역</p>
-                    <div id="crossword-grid"></div>
+                    <table id="crossword-grid" class="crossword-table"></table>
                 </div>
                 <div class="crossword-clues-area">
                     <h4>문제 목록</h4>
-                    <div id="crossword-question-list">
-                        <p>문제 번호를 클릭하여 질문을 확인하고 정답을 입력하세요.</p>
-                    </div>
+                    <div id="crossword-question-list" class="clue-list">
+                        </div>
                     
                     <div class="clue-detail">
-                        <h5 id="current-clue-number">선택된 문제: 없음</h5>
+                        <h5 id="current-clue-title">선택된 문항이 없습니다.</h5>
                         <p id="current-clue-text">질문이 여기에 표시됩니다.</p>
-                        <input type="text" id="answer-input" placeholder="정답을 입력하세요">
-                        <button id="check-answer-button" class="action-button primary">정답 확인</button>
-                        <div id="feedback-area" class="feedback-hint" style="display:none;"></div>
+                        <div id="input-container" style="display:none;">
+                            <input type="text" id="crossword-answer-input" placeholder="정답을 입력하세요">
+                            <button id="check-answer-button" class="action-button primary">정답 확인</button>
+                        </div>
+                        <div id="feedback-hint" class="feedback-hint" style="display:none;"></div>
                     </div>
                 </div>
             </div>
-             <button id="simulate-crossword-completion" class="action-button primary">십자말풀이 완료 (테스트)</button>
         </div>
     </div>
 
