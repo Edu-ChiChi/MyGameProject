@@ -1,23 +1,5 @@
 // crossword.js
-
-// --------------------------------------------------
-// 0. 데이터 정의 (최종 확정된 9개 문항)
-// --------------------------------------------------
-const GRID_SIZE = 8;
-
-const crosswordData = [
-    // number: 문항 번호, type: across/down, clue: 힌트, word: 정답, start_row/col: 1-based index, feedback: 강한 비계
-    { number: 1, type: 'across', clue: '행동주의에서 반응을 일으키는 외부의 신호예요.', word: '자극', start_row: 1, start_col: 2, feedback: '행동주의 학습 이론에서 행동 변화를 일으키는 외부의 요소를 뜻해요.' },
-    { number: 2, type: 'across', clue: '학습 목표를 향해 움직이게 만드는 심리적 원동력이에요.', word: '동기', start_row: 2, start_col: 1, feedback: '행동의 방향과 강도를 결정하는 심리적 상태를 뜻해요. 학습에 필수적이죠.' },
-    { number: 4, type: 'across', clue: '‘생각에 대한 생각’을 하면서 전략을 조절하는 능력이에요.', word: '초인지', start_row: 3, start_col: 6, feedback: "'인지에 대한 인지'라고도 불리며, 학습자가 자신의 학습을 계획하고 조절하는 능력이에요." },
-    { number: 7, type: 'across', clue: '해결 방법이 여러 가지라서 답이 명확하지 않은 문제예요.', word: '비구조화', start_row: 7, start_col: 3, feedback: '정답이 하나로 정해져 있지 않고, 해결 과정이 복잡한 실제 삶의 문제를 뜻해요.' },
-    
-    { number: 1, type: 'down', clue: '자신이 과제를 성공할 수 있다고 믿는 마음이에요.', word: '자기효능감', start_row: 1, start_col: 2, feedback: '스스로를 "할 수 있는 사람"이라고 믿는 자기 자신에 대한 평가를 뜻해요.' },
-    { number: 3, type: 'down', clue: '비고츠키가 말한, 도움을 받으면 가능한 발달 영역이에요.', word: '근접발달', start_row: 2, start_col: 4, feedback: '학습자가 혼자서는 어렵지만 타인의 도움으로 성공할 수 있는 잠재적 영역을 의미해요.' },
-    { number: 5, type: 'down', clue: '저장된 기억을 다시 꺼내는 과정이에요.', word: '인출', start_row: 3, start_col: 7, feedback: '장기 기억에 저장된 정보를 끄집어내는 과정으로, 반복하면 기억력이 향상돼요.' },
-    { number: 6, type: 'down', clue: '정보를 장기 기억으로 바꾸어 저장하는 과정이에요.', word: '부호화', start_row: 5, start_col: 6, feedback: '새로운 정보를 기억 속에 저장하기 위해 형태를 바꾸는(변환하는) 과정을 뜻해요.' },
-    { number: 7, type: 'down', clue: '학습자가 과제를 해결하도록 제공하는 임시적 도움이에요.', word: '비계', start_row: 7, start_col: 3, feedback: '구성주의에서 학습자를 위해 제공하는 발판이나 다리 역할을 하는 임시적인 도움을 뜻해요.' }
-];
+// (NOTE: data.js가 먼저 로드되어 전역 변수 gameState, GRID_SIZE, crosswordData를 사용할 수 있다고 가정합니다.)
 
 // --------------------------------------------------
 // 1. DOM 요소 및 전역 상태
@@ -34,7 +16,7 @@ const crosswordAnswerInput = document.getElementById('crossword-answer-input');
 const checkAnswerButton = document.getElementById('check-answer-button');
 
 let currentCrosswordItem = null;
-let answeredClues = new Set(); // 정답 맞힌 문항의 key (number+type) 저장
+let answeredClues = new Set(); 
 
 
 // --------------------------------------------------
@@ -42,28 +24,32 @@ let answeredClues = new Set(); // 정답 맞힌 문항의 key (number+type) 저�
 // --------------------------------------------------
 
 window.initializeCrossword = function() {
+    // data.js의 GRID_SIZE 사용
+    const size = GRID_SIZE; 
+    
     // 1. 상태 초기화
-    window.gameState.crosswordGridState = Array(GRID_SIZE).fill(0).map(() => Array(GRID_SIZE).fill(null));
+    gameState.crosswordGridState = Array(size).fill(0).map(() => Array(size).fill(null));
     answeredClues.clear();
     crosswordContainer.innerHTML = ''; 
     
     const allClues = { across: [], down: [] };
     
-    crosswordData.forEach((item, index) => {
+    crosswordData.forEach((item, index) => { // data.js의 crosswordData 사용
         const { word, type, start_row: r, start_col: c } = item;
         
         allClues[type].push(item);
         
-        // 그리드 상태에 단어 배치 및 교차점 처리 (1-based -> 0-based)
-        let row = r - 1; 
-        let col = c - 1; 
+        // 그리드 상태에 단어 배치 및 교차점 처리 (data.js에서 0-based index를 사용)
+        let row = r; 
+        let col = c; 
+        
         for (let i = 0; i < word.length; i++) {
-            if (row >= GRID_SIZE || col >= GRID_SIZE) continue;
+            if (row >= size || col >= size) continue;
 
-            const cellData = window.gameState.crosswordGridState[row][col];
+            const cellData = gameState.crosswordGridState[row][col];
             
             if (!cellData) {
-                window.gameState.crosswordGridState[row][col] = { 
+                gameState.crosswordGridState[row][col] = { 
                     letter: word[i].toUpperCase(), 
                     number: i === 0 ? item.number : null, 
                     clues: [] 
@@ -71,11 +57,11 @@ window.initializeCrossword = function() {
             } else {
                 // 교차점 처리
                 if (i === 0) {
-                    window.gameState.crosswordGridState[row][col].number = item.number;
+                    gameState.crosswordGridState[row][col].number = item.number;
                 }
             }
             // 이 셀에 해당하는 힌트 정보를 추가
-            window.gameState.crosswordGridState[row][col].clues.push({ index: index, type: type });
+            gameState.crosswordGridState[row][col].clues.push({ index: index, type: type });
 
             if (type === 'across') col++;
             else row++;
@@ -96,16 +82,16 @@ window.initializeCrossword = function() {
     crosswordCluesList.innerHTML = clueButtonsHTML;
     
     // 3. 실제 HTML 테이블 생성
-    for (let r = 0; r < GRID_SIZE; r++) {
+    for (let r = 0; r < size; r++) {
         const row = crosswordContainer.insertRow();
-        for (let c = 0; c < GRID_SIZE; c++) {
+        for (let c = 0; c < size; c++) {
             const cell = row.insertCell();
-            const cellData = window.gameState.crosswordGridState[r][c];
+            const cellData = gameState.crosswordGridState[r][c];
 
             if (cellData) {
                 cell.classList.add('puzzle-cell');
-                cell.dataset.row = r; // 0-based index
-                cell.dataset.col = c; // 0-based index
+                cell.dataset.row = r; 
+                cell.dataset.col = c; 
                 
                 if (cellData.number) {
                     const numSpan = document.createElement('span');
@@ -117,7 +103,7 @@ window.initializeCrossword = function() {
                 const input = document.createElement('input');
                 input.type = 'text';
                 input.maxLength = 1;
-                input.disabled = true; // 개별 칸 입력 비활성화 
+                input.disabled = true; 
                 cell.appendChild(input);
             } else {
                 cell.classList.add('empty-cell');
@@ -190,8 +176,8 @@ function highlightWordCells(item) {
         input.classList.remove('active-word');
     });
 
-    let r = item.start_row - 1; // 0-based
-    let c = item.start_col - 1; // 0-based
+    let r = item.start_row; 
+    let c = item.start_col; 
     
     for (let i = 0; i < item.word.length; i++) {
         const cell = document.querySelector(`.puzzle-cell[data-row="${r}"][data-col="${c}"]`);
@@ -232,13 +218,12 @@ function checkCrosswordAnswer() {
         document.querySelector(`.clue-button[data-index="${crosswordData.indexOf(currentCrosswordItem)}"]`).classList.add('answered');
 
         // 격자에 정답 채우기
-        let r = currentCrosswordItem.start_row - 1; // 0-based
-        let c = currentCrosswordItem.start_col - 1; // 0-based
+        let r = currentCrosswordItem.start_row; 
+        let c = currentCrosswordItem.start_col; 
         for (let i = 0; i < correctAnswer.length; i++) {
             const cell = document.querySelector(`.puzzle-cell[data-row="${r}"][data-col="${c}"]`);
             if (cell) {
                 const input = cell.querySelector('input');
-                // 시각적 효과를 위한 작은 딜레이
                 setTimeout(() => {
                     input.value = correctAnswer[i];
                     input.classList.add('correct-fill');
@@ -281,7 +266,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (confirm("현재까지의 진행 상황은 저장되지 않습니다. 다시 풀게 됩니다. 고민 화면으로 복귀합니다.")) {
                 document.getElementById('crossword-game-modal').style.display = 'none';
                 window.showScreen('initial-problem-area'); 
-                window.initializeCrossword(); // 완벽한 리셋
+                window.initializeCrossword(); 
             }
         });
     }
