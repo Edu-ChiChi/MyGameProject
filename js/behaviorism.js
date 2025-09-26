@@ -1,7 +1,7 @@
 // js/behaviorism.js
 
 // --------------------------------------------------
-// 💡 행동주의 미션 로직 (입력 창 제거)
+// 💡 행동주의 미션 로직 (입력 창 제거 버전)
 // --------------------------------------------------
 
 const currentTokensDisplay = document.getElementById('current-tokens');
@@ -11,9 +11,23 @@ const taskCardContainer = document.getElementById('task-card-container');
 function loadBehaviorismMission() {
     // 1. 작업 카드 새로고침
     currentTasks = [];
-    const reinforcementTasks = [...behaviorismTasks.filter(t => t.type === 'reinforcement')].sort(() => 0.5 - Math.random()).slice(0, 3);
-    const punishmentTasks = [...behaviorismTasks.filter(t => t.type === 'punishment')].sort(() => 0.5 - Math.random()).slice(0, 2);
-    currentTasks = [...reinforcementTasks, ...punishmentTasks].sort(() => 0.5 - Math.random()).slice(0, 2); // 총 2개 카드만 사용
+    // 무작위로 섞어 2개의 카드만 사용
+    const reinforcementTasks = [...behaviorismTasks.filter(t => t.type === 'reinforcement')].sort(() => 0.5 - Math.random());
+    const punishmentTasks = [...behaviorismTasks.filter(t => t.type === 'punishment')].sort(() => 0.5 - Math.random());
+    
+    // 최소 1개의 강화/처벌이 나오도록 조합
+    currentTasks = [];
+    if (reinforcementTasks.length > 0) currentTasks.push(reinforcementTasks.pop());
+    if (punishmentTasks.length > 0) currentTasks.push(punishmentTasks.pop());
+
+    // 만약 2개가 안 채워졌다면 나머지 채우기 (최대 2개 유지)
+    while (currentTasks.length < 2 && (reinforcementTasks.length > 0 || punishmentTasks.length > 0)) {
+        if (reinforcementTasks.length > 0) currentTasks.push(reinforcementTasks.pop());
+        else if (punishmentTasks.length > 0) currentTasks.push(punishmentTasks.pop());
+    }
+    
+    // 최종 2개 카드 무작위 재배치
+    currentTasks.sort(() => 0.5 - Math.random()); 
 
     taskCardContainer.innerHTML = currentTasks.map((task, index) => `
         <div class="task-card">
@@ -25,14 +39,10 @@ function loadBehaviorismMission() {
     `).join('');
 
     // 이벤트 리스너 재할당
-    currentTasks.forEach((_, index) => {
-        document.querySelectorAll('.task-card button').forEach(button => {
-             if (parseInt(button.dataset.taskIndex) === index) {
-                 // handleTaskClick 호출 시 인풋 요소는 더 이상 전달하지 않습니다.
-                 button.addEventListener('click', (e) => {
-                     handleTaskClick(index); 
-                 });
-             }
+    document.querySelectorAll('#task-card-container button').forEach(button => {
+        button.addEventListener('click', (e) => {
+            const taskIndex = parseInt(e.currentTarget.dataset.taskIndex);
+            handleTaskClick(taskIndex);
         });
     });
 
@@ -43,8 +53,6 @@ function loadBehaviorismMission() {
 // 작업 버튼 클릭 처리
 function handleTaskClick(taskIndex) {
     const task = currentTasks[taskIndex];
-    
-    // 학생의 입력 내용 확인 로직 (제거됨)
     
     let value = task.value;
     let message = '';
@@ -70,25 +78,25 @@ function handleTaskClick(taskIndex) {
     alert(message);
     
     // 미션 완료 체크
-    updateTokens(); 
+    checkBehaviorismMissionCompletion(); 
     
-    // 카드 내용 재할당
+    // 카드 내용 재할당 (새로운 카드 생성)
     loadBehaviorismMission(); 
 }
 
-// 미션 완료 및 코인 교환 처리
-function updateTokens() {
+// 미션 완료 체크
+function checkBehaviorismMissionCompletion() {
     if (gameState.tokens >= 5) {
         alert(`🎉 행동주의 미션 완료! 5 코인을 모았습니다! '습관의 저금통'을 통해 학습 습관을 만드는 방법을 깨달았습니다!`); 
         gameState.tokens = 0; 
         currentTokensDisplay.textContent = gameState.tokens;
         
-        // 미션 완료 후 전문가 선택 화면으로 복귀
-        showScreen('expert-selection-area'); 
+        // 미션 완료 후 해결창으로 이동
+        showScreen('resolution-area', 'behaviorism'); 
     }
 }
 
-// 코인 교환소 처리 (이 로직은 변경하지 않고 유지합니다.)
+// 코인 교환소 처리
 function handleExchange(cost, itemId) {
     if (gameState.tokens < cost) {
         alert("코인이 부족합니다.");
@@ -109,13 +117,11 @@ function handleExchange(cost, itemId) {
     } else if (itemId === 'preview') {
         // 다음 단원 미리보기 요약 영상 (5코인) -> 미션 완료 처리
         alert("다음 단원 미리보기 요약 영상을 획득했습니다. 단원 마무리 활동을 통해 미션을 완료합니다.");
-        updateTokens(); 
+        // 여기서 바로 5포인트를 획득하여 미션 완료 로직을 호출 (코인 획득은 이미 cost에서 차감됨)
     }
     
     document.getElementById('exchange-modal').style.display = 'none';
     
     // 미션 완료 체크
-    if (gameState.tokens >= 5) {
-        updateTokens();
-    }
+    checkBehaviorismMissionCompletion(); 
 }

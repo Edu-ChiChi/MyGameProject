@@ -19,6 +19,7 @@ const resolutionArea = document.getElementById('resolution-area');
 const restartButton = document.getElementById('restart-button');
 const resolutionMessage = document.getElementById('resolution-message');
 const resolutionEffect = document.getElementById('resolution-effect');
+const restartButtonSelection = document.getElementById('restart-button-selection');
 
 // 미션별 컨테이너
 const behaviorismMission = document.getElementById('behaviorism-mission');
@@ -34,7 +35,7 @@ const checkAnswerButton = document.getElementById('check-answer-button');
 // 2. 화면 전환 및 상태 업데이트 함수
 // --------------------------------------------------
 
-function showScreen(screenId) {
+function showScreen(screenId, strategy = null) {
     // 모든 화면 숨기기
     document.querySelectorAll('.screen').forEach(el => el.style.display = 'none');
     
@@ -47,29 +48,26 @@ function showScreen(screenId) {
         return;
     }
 
-    // 미션 포기 버튼 표시 제어
+    // 미션 포기 버튼 표시 제어 (미션 중일 때만)
     abandonMissionButton.style.display = (screenId === 'mission-area') ? 'block' : 'none';
     
-    // 초기 화면의 십자말풀이 버튼 제어
-    startCrosswordButtonInitial.style.display = (screenId === 'initial-problem-area') ? 'block' : 'none';
+    // 전문가 선택 화면 복귀 시 버튼 활성화
+    if (screenId === 'expert-selection-area') {
+        restartButtonSelection.style.display = 'block'; // '다른 전략 체험하기' 버튼 활성화
+        // 모든 전문가 버튼 활성화 (미션 성공 여부와 상관없이 계속 체험 가능)
+        experts.forEach(expert => expert.classList.remove('disabled'));
+    } else {
+        restartButtonSelection.style.display = 'none';
+    }
+
 
     if (screenId === 'resolution-area') {
-        updateResolutionScreen();
+        updateResolutionScreen(strategy);
     }
 }
 
-function updateResolutionScreen() {
-    // 십자말풀이 완료 시 최종 메시지 출력
-    if (gameState.isCrosswordCompleted) {
-        document.querySelector('#resolution-area h2').textContent = `🎉 최종 단원 마무리 성공!`;
-        resolutionMessage.innerHTML = `모든 전략을 체험하고 단원 마무리 십자말풀이까지 완료했습니다! 이제 학습에 대한 자신만의 해답을 찾았을 것입니다!`;
-        resolutionEffect.textContent = `다양한 학습 전략을 이해하고 핵심 개념을 최종적으로 점검함으로써, 스스로 학습 방향을 설정하는 능력이 향상되었습니다.`;
-        restartButton.textContent = '다른 전략 체험하기';
-        return;
-    }
-
-    // (선택사항: 미션 완료 후 바로 resolution_area로 가지 않으므로 이 코드는 사용되지 않음, 안전을 위해 남겨둠)
-    const strategy = gameState.currentStrategy;
+function updateResolutionScreen(strategy) {
+    // 최종 메시지 구성
     const strategyName = strategyMap[strategy];
     
     document.querySelector('#resolution-area h2').textContent = `🎉 미션 성공! ${strategyName} 전략 결과`;
@@ -84,6 +82,10 @@ function updateResolutionScreen() {
         const result = constructivismScenarios[0].choices.find(c => c.id === gameState.constructivismChoiceId);
         resolutionMessage.innerHTML = `와, 정말 감사합니다! 제가 가진 고민이 해결되는 것 같아요. 이제 어떻게 공부해야 할지 알 것 같아요!`;
         resolutionEffect.innerHTML = `당신은 <strong>${result.reward.badge}</strong>를 획득했습니다! 다른 사람에게 지식을 설명하고 가르치는 과정을 통해 자신의 지식이 더욱 명료해지는 **'학습 전이 효과'**를 얻었습니다.`;
+    } else if (strategy === 'crossword') {
+         document.querySelector('#resolution-area h2').textContent = `🎉 단원 마무리 완료! 학습 전략 종합`;
+         resolutionMessage.innerHTML = `모든 전략을 체험하고 단원 마무리 십자말풀이까지 완료했습니다! 이제 학습에 대한 자신만의 해답을 찾았을 것입니다!`;
+         resolutionEffect.textContent = `다양한 학습 전략을 이해하고 핵심 개념을 최종적으로 점검함으로써, 스스로 학습 방향을 설정하는 능력이 향상되었습니다.`;
     }
 }
 
@@ -124,14 +126,20 @@ function initializeGame() {
     // 3.1. 공통 이벤트
     // ----------------------
     consultButton.addEventListener('click', () => { showScreen('expert-selection-area'); });
+    
+    // 전문가 선택 (미션 시작)
     experts.forEach(expert => {
         expert.addEventListener('click', () => {
             const strategy = expert.getAttribute('data-strategy');
             startMission(strategy);
         });
     });
-    // 재시작 버튼은 전문가 선택 화면으로 복귀
+    
+    // 미션 완료 후 '다른 전략 체험하기' (해결창)
     restartButton.addEventListener('click', () => { showScreen('expert-selection-area'); });
+    
+    // 전문가 선택 화면의 '다른 전략 체험하기' (선택창)
+    restartButtonSelection.addEventListener('click', () => { showScreen('expert-selection-area'); });
     
     // 미션 포기 버튼 (확인 메시지 포함)
     abandonMissionButton.addEventListener('click', () => {
@@ -146,17 +154,24 @@ function initializeGame() {
     });
 
     // ----------------------
-    // 3.2. 행동주의 교환소 이벤트 (game.js에 통합)
+    // 3.2. 행동주의 교환소 이벤트
     // ----------------------
+    document.getElementById('open-exchange-button').addEventListener('click', () => {
+        document.getElementById('modal-current-tokens').textContent = gameState.tokens;
+        document.getElementById('exchange-modal').style.display = 'flex';
+    });
+    document.getElementById('close-modal-button').addEventListener('click', () => {
+        document.getElementById('exchange-modal').style.display = 'none';
+    });
     const exchangeButtons = document.querySelectorAll('.exchange-button');
     exchangeButtons.forEach(button => {
         button.addEventListener('click', (e) => {
             const cost = parseInt(e.currentTarget.dataset.cost);
             const id = e.currentTarget.dataset.id;
-            // behaviorism.js의 handleExchange 함수 호출
             handleExchange(cost, id); 
         });
     });
+
 
     // ----------------------
     // 3.3. 십자말풀이 이벤트 (독립 미션)
@@ -167,11 +182,12 @@ function initializeGame() {
         drawCrosswordGrid(); // crossword.js의 함수 호출 (초기화 및 로드)
     });
     
-    // 뒤로 가기 (진행 상황 초기화)
+    // 뒤로 가기 (진행 상황 초기화 확인)
     closeCrosswordModal.addEventListener('click', () => {
         if (confirm("현재까지의 진행 상황은 저장되지 않습니다. 다시 풀게 됩니다. 고민 화면으로 복귀합니다.")) {
             crosswordModal.style.display = 'none';
-            showScreen('initial-problem-area'); // 초기 화면으로 복귀
+            // 초기화 후 고민 화면으로 복귀
+            showScreen('initial-problem-area'); 
         }
     });
 

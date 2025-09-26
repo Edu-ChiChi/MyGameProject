@@ -15,16 +15,15 @@ let gameState = {
 // --------------------------------------------------
 // 🚀 1. 행동주의 미션 데이터
 // --------------------------------------------------
-// 강화(Reinforcement)와 처벌(Punishment)이 섞인 작업 목록
 const behaviorismTasks = [
-    // 강화 작업 (정답: 획득, 오답: 차감)
-    { id: 1, title: "단어 10개 외우기", type: 'reinforcement', correct: true, value: 1, action: "목표 달성 확인" },
-    { id: 2, title: "수학 문제 3개 풀기", type: 'reinforcement', correct: true, value: 1, action: "목표 달성 확인" },
-    { id: 3, title: "교과서 10분 읽기", type: 'reinforcement', correct: true, value: 1, action: "목표 달성 확인" },
+    // 강화 작업 (좋은 습관, +1)
+    { id: 1, title: "단어 10개 외우기", type: 'reinforcement', correct: true, value: 1, action: "선택" },
+    { id: 2, title: "수학 문제 3개 풀기", type: 'reinforcement', correct: true, value: 1, action: "선택" },
+    { id: 3, title: "교과서 10분 읽기", type: 'reinforcement', correct: true, value: 1, action: "선택" },
     
-    // 처벌 작업 (정답: 차감, 오답: 획득) -> UX상 단순화: "잘못된 습관"을 선택하면 토큰 차감
-    { id: 101, title: "공부 중 SNS 알림 확인", type: 'punishment', correct: false, value: -1, action: "나쁜 습관 선택" },
-    { id: 102, title: "숙제를 미루고 게임하기", type: 'punishment', correct: false, value: -1, action: "나쁜 습관 선택" },
+    // 처벌 작업 (나쁜 습관, -1)
+    { id: 101, title: "공부 중 SNS 알림 확인", type: 'punishment', correct: false, value: -1, action: "선택" },
+    { id: 102, title: "숙제를 미루고 게임하기", type: 'punishment', correct: false, value: -1, action: "선택" },
 ];
 let currentTasks = []; 
 
@@ -37,8 +36,8 @@ const cognitivismPieces = [
     { id: 'p3', name: '토큰 경제', category: '행동주의' },
     { id: 'p4', name: '자극-반응', category: '행동주의' },
     
-    { id: 'p5', name: '인출', category: '인지주의' }, // 변경
-    { id: 'p6', name: '메타인지', category: '인지주의' }, // 변경
+    { id: 'p5', name: '인출', category: '인지주의' }, 
+    { id: 'p6', name: '메타인지', category: '인지주의' }, 
     { id: 'p7', name: '정보 처리', category: '인지주의' },
     { id: 'p8', name: '전이', category: '인지주의' },
     

@@ -28,7 +28,11 @@ function loadConstructivismMission() {
     
     // 3. 이벤트 리스너 재할당 (버튼에 이벤트 연결)
     document.querySelectorAll('#scaffolding-choices button').forEach(button => {
-        button.addEventListener('click', (e) => {
+        // 이전 리스너 제거 후 추가 (중복 방지)
+        const newButton = button.cloneNode(true);
+        button.parentNode.replaceChild(newButton, button);
+        
+        newButton.addEventListener('click', (e) => {
             const choiceId = parseInt(e.currentTarget.dataset.choiceId);
             handleScaffoldingChoice(choiceId);
         });
@@ -56,7 +60,7 @@ function handleScaffoldingChoice(choiceId) {
     completeMentorMissionButton.onclick = () => {
         alert(`🎉 구성주의 미션 완료! 지식 공유 멘토링을 통해 자신의 지식을 확고히 하는 방법을 깨달았습니다!`); 
         
-        // 미션 완료 후 전문가 선택 화면으로 복귀
-        showScreen('expert-selection-area');
+        // 미션 완료 후 해결창으로 이동
+        showScreen('resolution-area', 'constructivism');
     };
 }

@@ -5,11 +5,24 @@
 // --------------------------------------------------
 
 const puzzlePiecesContainer = document.getElementById('puzzle-pieces-container');
+const dropZones = document.querySelectorAll('.drop-zone');
 
 // 미션 시작 시 호출 (game.js에서 호출됨)
 function loadCognitivismMission() {
     puzzlePiecesContainer.innerHTML = ''; // 초기화
     gameState.correctCognitivismDrops = 0; // 초기화
+    
+    // 드래그 앤 드롭 이벤트 리스너 할당 (단, 한 번만)
+    dropZones.forEach(zone => {
+        zone.removeEventListener('dragover', handleDragOver);
+        zone.removeEventListener('dragleave', handleDragLeave);
+        zone.removeEventListener('drop', handleDrop);
+        
+        zone.addEventListener('dragover', handleDragOver);
+        zone.addEventListener('dragleave', handleDragLeave);
+        zone.addEventListener('drop', handleDrop);
+        zone.innerHTML = `<h4>${zone.dataset.category}</h4>`; // 초기화된 상태로 문구만 남김
+    });
     
     // 조각들을 무작위로 섞어 배치
     cognitivismPieces.sort(() => 0.5 - Math.random()).forEach(piece => {
@@ -18,6 +31,7 @@ function loadCognitivismMission() {
         div.draggable = true;
         div.textContent = piece.name;
         div.dataset.category = piece.category;
+        div.dataset.pieceId = piece.id;
         div.addEventListener('dragstart', handleDragStart);
         puzzlePiecesContainer.appendChild(div);
     });
@@ -26,6 +40,7 @@ function loadCognitivismMission() {
 // Drag 시작
 function handleDragStart(e) {
     e.dataTransfer.setData('text/plain', e.target.dataset.category);
+    e.dataTransfer.setData('text/pieceId', e.target.dataset.pieceId);
     e.target.classList.add('dragging');
 }
 
@@ -39,22 +54,23 @@ function handleDragOver(e) {
 
 // Drag Leave
 function handleDragLeave(e) {
-    if (e.target.classList.contains('drop-zone')) {
-        e.target.classList.remove('drag-over');
+    // 드롭존 내부 요소에서 나갔을 때도 drag-over 클래스를 제거하지 않도록 currentTarget 사용
+    if (e.currentTarget.classList.contains('drop-zone')) {
+        e.currentTarget.classList.remove('drag-over');
     }
 }
 
 // Drop
 function handleDrop(e) {
     e.preventDefault();
-    e.target.classList.remove('drag-over');
+    e.currentTarget.classList.remove('drag-over');
 
     const droppedCategory = e.dataTransfer.getData('text/plain');
+    const pieceId = e.dataTransfer.getData('text/pieceId');
     const targetZone = e.currentTarget;
     const targetCategory = targetZone.dataset.category;
     
-    // 드롭된 요소 찾기
-    const draggedElement = document.querySelector('.dragging');
+    const draggedElement = document.querySelector(`.puzzle-piece[data-piece-id="${pieceId}"]`);
 
     if (droppedCategory === targetCategory) {
         // 정답 처리
@@ -68,8 +84,8 @@ function handleDrop(e) {
             
             // 미션 완료 확인
             if (gameState.correctCognitivismDrops === gameState.totalCognitivismPieces) {
-                alert("🎉 모든 개념을 올바르게 연결했습니다! 기억의 방 탈출 성공! 이제 다른 전략을 체험하거나 단원 마무리 십자말풀이 활동을 할 수 있습니다.");
-                showScreen('expert-selection-area'); 
+                alert("🎉 모든 개념을 올바르게 연결했습니다! 기억의 방 탈출 성공!");
+                showScreen('resolution-area', 'cognitivism'); // 완료 후 해결창으로 이동
             }
         }
     } else {

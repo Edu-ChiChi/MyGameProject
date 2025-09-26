@@ -1,7 +1,7 @@
 // js/crossword.js
 
 // --------------------------------------------------
-// 💡 십자말풀이 미션 로직 (독립적)
+// 💡 십자말풀이 미션 로직 (독립적, 미저장, 자유선택 구현)
 // --------------------------------------------------
 
 // DOM 요소 ID
@@ -23,7 +23,7 @@ let answeredClues = new Set(); // 정답 맞힌 문항의 key (number+type) 저�
 
 // 퍼즐판을 HTML에 그리고 초기화 상태를 gameState에 저장
 function drawCrosswordGrid() {
-    // 미션 진입 시, 모든 상태 초기화 (저장 없음 원칙)
+    // 1. 상태 초기화
     gameState.crosswordGridState = Array(GRID_SIZE).fill(0).map(() => Array(GRID_SIZE).fill(null));
     answeredClues.clear();
     crosswordContainer.innerHTML = ''; 
@@ -35,10 +35,9 @@ function drawCrosswordGrid() {
         const { word, type, start_row: r, start_col: c } = item;
         
         // 힌트 버튼 목록 생성
-        const buttonText = `${item.type === 'across' ? '가로' : '세로'} ${item.number}`;
         allClues[type].push(item);
         
-        // 그리드 상태에 단어 배치
+        // 그리드 상태에 단어 배치 및 교차점 처리
         let row = r;
         let col = c;
         for (let i = 0; i < word.length; i++) {
@@ -61,11 +60,11 @@ function drawCrosswordGrid() {
     });
 
     // 힌트 버튼 HTML 구성
-    allClues.across.forEach((item, index) => {
+    allClues.across.forEach((item) => {
         clueButtonsHTML += `<button class="clue-button" data-index="${crosswordData.indexOf(item)}" data-type="across" data-number="${item.number}">가로 ${item.number}</button>`;
     });
     clueButtonsHTML += '<h4>세로</h4>';
-    allClues.down.forEach((item, index) => {
+    allClues.down.forEach((item) => {
         clueButtonsHTML += `<button class="clue-button" data-index="${crosswordData.indexOf(item)}" data-type="down" data-number="${item.number}">세로 ${item.number}</button>`;
     });
 
@@ -95,7 +94,7 @@ function drawCrosswordGrid() {
                 input.type = 'text';
                 input.maxLength = 1;
                 input.dataset.correct = cellData.letter.toUpperCase();
-                input.disabled = true; 
+                input.disabled = true; // 개별 칸 입력 비활성화 (전체 단어 입력만 활성화)
                 cell.appendChild(input);
             } else {
                 cell.classList.add('empty-cell');
@@ -104,7 +103,7 @@ function drawCrosswordGrid() {
     }
     
     resetCrosswordUI();
-    crosswordMessage.textContent = `단원의 핵심 개념 9가지를 모두 채워 넣으세요. (${crosswordData.length}문항) 뒤로 가기 시 진행 상황은 저장되지 않습니다.`;
+    crosswordMessage.textContent = `단원의 핵심 개념 9가지를 모두 채워 넣으세요. (총 ${crosswordData.length}문항) 뒤로 가기 시 진행 상황은 저장되지 않습니다.`;
 }
 
 // UI 초기화 (재풀이 시 사용)
@@ -137,7 +136,8 @@ function selectCrosswordClue(itemIndex) {
 
     // UI 업데이트
     document.querySelectorAll('.clue-button').forEach(btn => btn.classList.remove('selected'));
-    document.querySelector(`.clue-button[data-index="${itemIndex}"]`).classList.add('selected');
+    const selectedButton = document.querySelector(`.clue-button[data-index="${itemIndex}"]`);
+    selectedButton.classList.add('selected');
 
     currentClueTitle.textContent = `${item.type === 'across' ? '가로' : '세로'} ${item.number}. (${item.word.length}글자)`;
     currentClueText.textContent = item.clue;
@@ -224,6 +224,8 @@ function checkCrosswordAnswer() {
         // 미션 완료 체크
         if (answeredClues.size === crosswordData.length) {
             handleCrosswordCompletion();
+        } else {
+             crosswordAnswerInput.value = ''; // 정답을 맞힌 후 입력창 초기화
         }
 
     } else {
@@ -241,13 +243,13 @@ function handleCrosswordCompletion() {
     
     gameState.isCrosswordCompleted = true;
     
-    // 최종 보상 지급 (5 코인)
+    // 최종 보상 지급 (5 코인) - 사용하지 않더라도 기록을 위해 남겨둠
     const reward = 5; 
     gameState.tokens += reward;
 
-    alert(`🎉 십자말풀이 완성! 모든 단원 핵심 개념을 복습했습니다. (단원 마무리 코인 ${reward}개 획득)`);
+    alert(`🎉 십자말풀이 완성! 모든 단원 핵심 개념을 복습했습니다. 이제 모든 미션을 체험할 준비가 되었습니다!`);
     
     // 🚀 [핵심 로직] 최종 해결 화면으로 이동
     document.getElementById('crossword-game-modal').style.display = 'none';
-    showScreen('resolution-area'); // game.js의 함수 호출
+    showScreen('resolution-area', 'crossword'); // game.js의 함수 호출
 }

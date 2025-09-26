@@ -80,18 +80,19 @@ h3 { color: #333; }
     box-shadow: 0 0 15px rgba(0, 123, 255, 0.5);
 }
 .expert-bubble {
-    height: 80px;
+    height: 120px; /* 말풍선 크기 키움 */
     background-color: #e0f0ff;
     border-radius: 10px;
     padding: 10px;
     margin-bottom: 10px;
-    font-size: 0.8em;
+    font-size: 0.9em;
     display: flex;
     align-items: center;
     justify-content: center;
     text-align: left;
     white-space: pre-wrap;
     border: 1px solid #a0c4ff;
+    line-height: 1.4;
 }
 
 /* 3. 미션 영역 공통 */
@@ -133,6 +134,7 @@ h3 { color: #333; }
 }
 #task-card-container {
     display: flex;
+    flex-wrap: wrap; /* 카드가 3개 이상일 경우 줄바꿈 */
     gap: 20px;
     width: 100%;
     justify-content: center;
@@ -143,6 +145,9 @@ h3 { color: #333; }
     border-radius: 8px;
     width: 45%;
     background-color: #fff8e1;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
 }
 .task-card button {
     margin-top: 10px;
@@ -194,6 +199,7 @@ h3 { color: #333; }
     border-radius: 5px;
     cursor: grab;
     box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
+    transition: background-color 0.3s;
 }
 
 /* 구성주의 */
