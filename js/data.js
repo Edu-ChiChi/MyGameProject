@@ -91,16 +91,16 @@ const crosswordData = [
     // word: 정답 단어 (띄어쓰기 없음, 대문자 사용)
     // start_row/col: 퍼즐판에서 시작 위치 (0부터 시작)
     // direction: 'across' (가로) 또는 'down' (세로)
-    { number: 1, type: 'across', word: "자극", clue: "행동주의에서 반응을 일으키는 외부의 신호예요.", start_row: 0, start_col: 2, feedback: "행동주의에서 반응을 일으키는 외부의 신호입니다." },
-    { number: 2, type: 'across', word: "동기", clue: "학습 목표를 향해 움직이게 만드는 심리적 원동력이에요.", start_row: 1, start_col: 1, feedback: "학습 목표를 향해 움직이게 만드는 심리적 원동력입니다." },
-    { number: 4, type: 'across', word: "초인지", clue: "‘생각에 대한 생각’을 하면서 전략을 조절하는 능력이에요.", start_row: 2, start_col: 6, feedback: "‘생각에 대한 생각’을 하며 전략을 조절하는 능력입니다." },
-    { number: 7, type: 'across', word: "비구조화", clue: "해결 방법이 여러 가지라서 답이 명확하지 않은 문제예요.", start_row: 6, start_col: 3, feedback: "현실의 복잡한 문제들이 대부분 여기에 해당합니다. 해결 방법이 여러 가지이고 답이 명확하지 않은 문제입니다." },
+    { number: 1, type: 'across', word: "자극", clue: "행동주의자들은 학습을 이것에 대한 반응으로서 변화하는 행동으로 규정한다.", start_row: 0, start_col: 2, feedback: "행동주의에서 반응을 일으키는 외부의 신호입니다." },
+    { number: 2, type: 'across', word: "동기", clue: "학습에 대한 흥미와 관심을 일으키고 학습 목표를 향해 나아갈 수 있도록 행동을 유발하고 지속시키는 마음을 가르킨다.", start_row: 1, start_col: 1, feedback: "학습 목표를 향해 움직이게 만드는 심리적 원동력입니다." },
+    { number: 4, type: 'across', word: "초인지", clue: "자신의 인지 과정에 대하여 한 차원 높은 시각에서 관찰, 발견, 통제하는 정신 작용을 말한다. ", start_row: 2, start_col: 6, feedback: "‘생각에 대한 생각’을 하며 전략을 조절하는 능력입니다." },
+    { number: 7, type: 'across', word: "비구조화", clue: "목표가 모호하고 문제를 해결하는 방법이 명확하지 않은 문제를 이러한 문제라고 한다.", start_row: 6, start_col: 3, feedback: "현실의 복잡한 문제들이 대부분 여기에 해당합니다. 해결 방법이 여러 가지이고 답이 명확하지 않은 문제입니다." },
     
-    { number: 1, type: 'down', word: "자기효능감", clue: "자신이 과제를 성공할 수 있다고 믿는 마음이에요.", start_row: 0, start_col: 2, feedback: "스스로 잘할 수 있다는 자신감입니다." },
-    { number: 3, type: 'down', word: "근접발달", clue: "비고츠키가 말한, 도움을 받으면 가능한 발달 영역이에요.", start_row: 1, start_col: 4, feedback: "혼자서는 안 되지만, 도움이 있으면 가능한 잠재력의 영역입니다." },
-    { number: 5, type: 'down', word: "인출", clue: "저장된 기억을 다시 꺼내는 과정이에요.", start_row: 2, start_col: 7, feedback: "시험 볼 때 필요한 바로 그 능력! 머릿속 정보를 밖으로 끄집어내는 것입니다." },
-    { number: 6, type: 'down', word: "부호화", clue: "정보를 장기 기억으로 바꾸어 저장하는 과정이에요.", start_row: 4, start_col: 6, feedback: "정보를 머릿속 파일로 만드는 과정입니다. 압축이나 요약도 되고 정보를 장기적으로 가져갈 수 있어요." },
-    { number: 7, type: 'down', word: "비계", clue: "학습자가 과제를 해결하도록 제공하는 임시적 도움이에요.", start_row: 6, start_col: 3, feedback: "구성주의의 핵심 개념으로, 친구나 교사의 '임시적 도움'입니다." }
+    { number: 1, type: 'down', word: "자기효능감", clue: "과제나 학습 활동을 수행할 때, 자신이 적절한 행동을 함으로써 문제를 해결할 수 있다고 생각하는 스스로에 대한 믿음, 자신의 능력에 대한 믿음을 말한다.", start_row: 0, start_col: 2, feedback: "스스로 잘할 수 있다는 자신감입니다." },
+    { number: 3, type: 'down', word: "근접발달", clue: "비고츠키가 도입한 것으로, 아동이 스스로 해결하거나 성취할 수 있는 능력과 자신보다 인지 수준이 높은 또래나 성인의 도움을 받아 과제를 해결하거나 성취할 수 있을 것으로 기대되는 능력 간의 차이를 나타내는 영역을 이러한 영역이라고 한다. ", start_row: 1, start_col: 4, feedback: "혼자서는 안 되지만, 도움이 있으면 가능한 잠재력의 영역입니다." },
+    { number: 5, type: 'down', word: "인출", clue: "자기 기억에서 정보를 탐색하여 꺼내는 과정이나 행위를 말한다.", start_row: 2, start_col: 7, feedback: "시험 볼 때 필요한 바로 그 능력! 머릿속 정보를 밖으로 끄집어내는 것입니다." },
+    { number: 6, type: 'down', word: "부호화", clue: "외부에서 들어온 정보를 작업 기억에서 장기 기억으로 저장할 수 있도록 변환하는 과정이다.", start_row: 4, start_col: 6, feedback: "정보를 머릿속 파일로 만드는 과정입니다. 압축이나 요약도 되고 정보를 장기적으로 가져갈 수 있어요." },
+    { number: 7, type: 'down', word: "비계", clue: "학습자의 실제 발달 수준보다는 높지만 타인의 도움을 받으면 해결할 수 있는 수준의 과제를 수행할 때 제공되는 도움을 이것이라고 한다.", start_row: 6, start_col: 3, feedback: "구성주의의 핵심 개념으로, 친구나 교사의 '임시적 도움'입니다." }
 ];
 
 // --------------------------------------------------
