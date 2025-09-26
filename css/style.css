@@ -1,399 +1,342 @@
-/*
- * File: css/style.css
- * Description: 교육 전략 게임 시연 자료의 최종 스타일 시트
- * - 모든 미션 기능 및 전문가 말풍선 겹침 방지 스타일 적용
- */
-
 body {
-    font-family: 'Arial', sans-serif;
-    background-color: #f4f7f9;
-    color: #333;
+    font-family: Arial, sans-serif;
     display: flex;
     justify-content: center;
-    align-items: flex-start;
+    align-items: center;
     min-height: 100vh;
-    padding: 20px;
     margin: 0;
+    background-color: #f4f4f9;
 }
 
-#game-container {
-    background-color: #ffffff;
-    border-radius: 12px;
-    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
-    padding: 30px;
-    width: 100%;
+.screen {
+    width: 90%;
     max-width: 800px;
+    padding: 30px;
+    background: white;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    border-radius: 10px;
     text-align: center;
     position: relative;
 }
 
-h1 {
-    color: #007bff;
-    margin-bottom: 20px;
-    border-bottom: 2px solid #eee;
-    padding-bottom: 10px;
-}
+h2 { color: #007bff; }
+h3 { color: #333; }
 
-h2 {
-    color: #333;
-    margin-bottom: 25px;
-    font-size: 1.6em;
-}
-
-p {
-    line-height: 1.6;
-    margin-bottom: 15px;
-}
-
-/* --- 공통 버튼 스타일 --- */
 .action-button {
-    padding: 12px 25px;
+    padding: 10px 20px;
+    margin: 10px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: background-color 0.3s;
+}
+
+.large-button {
+    font-size: 1.2em;
     background-color: #007bff;
     color: white;
-    border: none;
-    border-radius: 6px;
-    cursor: pointer;
-    font-size: 1.05em;
-    font-weight: bold;
-    transition: background-color 0.3s, transform 0.1s;
-    margin: 10px 5px;
 }
-
-.action-button:hover {
+.large-button:hover {
     background-color: #0056b3;
 }
-
-.action-button:active {
-    transform: scale(0.98);
-}
-
 .small-button {
-    padding: 8px 15px;
     font-size: 0.9em;
-    opacity: 0.7;
-    margin: 15px auto 0 auto; /* 중앙 배치 */
-    display: block; 
+    background-color: #6c757d;
+    color: white;
+}
+.small-button:hover {
+    background-color: #5a6268;
 }
 
-/* --- 저작권 및 초기 화면 --- */
-#copyright-notice {
-    font-size: 0.8em;
-    color: #888;
-    margin-top: 30px;
-    line-height: 1.4;
+/* 1. 초기 화면 */
+.problem-box {
+    padding: 20px;
+    margin-bottom: 20px;
+    border: 2px solid #ddd;
+    border-radius: 8px;
+    background-color: #fffaf0;
+    font-size: 1.1em;
+    line-height: 1.6;
+    text-align: left;
 }
 
-/* --- 전문가 선택 영역 및 말풍선 --- */
-#expert-list {
+/* 2. 전문가 선택 */
+.expert-container {
     display: flex;
     justify-content: space-around;
-    gap: 20px;
-    /* 겹침 방지 및 중앙 배치를 위해 충분히 확보 */
-    margin-top: 120px; 
+    margin-top: 20px;
 }
-
 .expert {
-    cursor: pointer;
+    width: 30%;
     padding: 15px;
     border: 2px solid #ccc;
     border-radius: 10px;
-    width: 30%;
-    transition: box-shadow 0.3s, transform 0.3s;
-    background-color: #f9f9f9;
-    position: relative; 
+    cursor: pointer;
+    transition: box-shadow 0.3s;
+    background-color: #fafafa;
 }
-
 .expert:hover {
-    box-shadow: 0 4px 10px rgba(0, 123, 255, 0.3);
-    transform: translateY(-5px);
+    box-shadow: 0 0 15px rgba(0, 123, 255, 0.5);
 }
-
-.expert-image {
-    width: 100px;  
-    height: 100px;
-    border-radius: 50%; 
-    object-fit: cover;
-    display: block;
-    margin: 15px auto 10px auto;
-    border: 3px solid #007bff;
-}
-
-/* 💬 말풍선 스타일 (최종 수정) */
-.speech-bubble {
-    position: absolute;
-    bottom: 150%; 
-    left: 50%;
-    transform: translateX(-50%);
-    width: 120%; /* 너비 축소 */
-    min-height: 80px;
-    padding: 10px;
-    background: #fff;
-    border-radius: 8px;
-    border: 2px solid #555;
-    font-size: 0.8em;
-    text-align: left;
-    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-    z-index: 10;
-}
-
-.speech-bubble:after {
-    content: '';
-    position: absolute;
-    top: 100%;
-    left: 50%;
-    width: 0;
-    height: 0;
-    border: 10px solid transparent;
-    border-top-color: #fff; 
-    margin-left: -10px;
-    z-index: 10;
-}
-.speech-bubble:before {
-    content: '';
-    position: absolute;
-    top: 100%;
-    left: 50%;
-    width: 0;
-    height: 0;
-    border: 12px solid transparent;
-    border-top-color: #555; 
-    margin-left: -12px;
-}
-
-
-/* --- 미션 진행 영역 (공통) --- */
-.result-box {
-    background-color: #e9f7eb;
-    border: 2px solid #28a745;
-    padding: 25px;
+.expert-bubble {
+    height: 80px;
+    background-color: #e0f0ff;
     border-radius: 10px;
-    margin-top: 30px;
-}
-
-.final-message {
-    font-weight: bold;
-    color: #155724;
-    margin-top: 15px;
-}
-
-.highlight-text {
-    color: #ff5722;
-    font-weight: 800;
-}
-
-/* --- 행동주의 미션 (습관의 저금통) --- */
-#token-display {
-    font-size: 1.3em;
-    font-weight: bold;
-    color: #28a745;
-    margin-bottom: 20px;
-    position: relative;
-}
-
-#piggy-bank {
-    width: 80px;
-    height: auto;
-    margin-right: 15px;
-    vertical-align: middle;
-}
-
-#task-selection-area {
+    padding: 10px;
+    margin-bottom: 10px;
+    font-size: 0.8em;
     display: flex;
-    justify-content: space-around;
+    align-items: center;
+    justify-content: center;
+    text-align: left;
+    white-space: pre-wrap;
+    border: 1px solid #a0c4ff;
+}
+
+/* 3. 미션 영역 공통 */
+#mission-area {
+    min-height: 500px;
+}
+.mission-screen {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
     gap: 20px;
     margin-top: 20px;
 }
+#abandon-mission-button {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    background-color: #dc3545;
+}
+#abandon-mission-button:hover {
+    background-color: #c82333;
+}
 
-.choice-card {
-    flex: 1;
-    padding: 20px;
+/* 행동주의 */
+#token-display {
+    font-size: 1.2em;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+#piggy-bank {
+    font-size: 2.5em;
+    animation: bounce 0.5s ease-in-out;
+}
+@keyframes bounce {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-5px); }
+}
+#task-card-container {
+    display: flex;
+    gap: 20px;
+    width: 100%;
+    justify-content: center;
+}
+.task-card {
+    padding: 15px;
+    border: 1px solid #ffc107;
     border-radius: 8px;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    width: 45%;
+    background-color: #fff8e1;
+}
+.task-card button {
+    margin-top: 10px;
+    background-color: #ffc107;
+    color: #333;
 }
 
-.correct-choice {
-    background-color: #e9f7eb; 
-    border: 2px solid #28a745;
+/* 인지주의 */
+#puzzle-area {
+    width: 100%;
+    margin-top: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
-
-.wrong-choice {
-    background-color: #fbebeb; 
-    border: 2px solid #dc3545;
+#drop-zones-container {
+    display: flex;
+    justify-content: space-around;
+    width: 100%;
+    margin-bottom: 30px;
 }
-
-.task-input {
-    width: 80%;
-    padding: 8px;
-    margin: 5px 0 10px 0;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    box-sizing: border-box;
-}
-
-/* 🚀 코인 애니메이션 스타일 */
-.new-coin {
-    position: fixed; 
-    width: 25px;
-    height: 25px;
-    background-color: gold;
-    border-radius: 50%;
-    text-align: center;
-    line-height: 25px;
-    font-size: 14px;
-    font-weight: bold;
-    color: #cc9900;
-    z-index: 1000;
-    box-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
-    transition: transform 0.8s ease-in, opacity 0.8s ease-in; 
-}
-
-
-/* --- 인지주의 미션 (기억의 방 탈출) --- */
-.guide-text-dnd {
+.drop-zone {
+    width: 30%;
+    min-height: 100px;
+    border: 3px dashed #007bff;
+    border-radius: 10px;
+    padding: 10px;
+    background-color: #f0f8ff;
     color: #007bff;
-    font-weight: bold;
-    margin-bottom: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
-
+.drag-over {
+    background-color: #cceeff;
+    border-color: #0056b3;
+}
 #puzzle-pieces-container {
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
     gap: 10px;
-    min-height: 120px; 
-    border: 1px dashed #bbb;
-    padding: 15px;
-    margin-bottom: 25px;
-    border-radius: 8px;
-    background-color: #f7f7f7;
+    max-width: 600px;
 }
-
 .puzzle-piece {
-    padding: 8px 15px;
-    background-color: #a0d4e4; 
-    color: #004c64;
-    border-radius: 20px;
-    cursor: grab;
-    font-size: 0.95em;
-    font-weight: bold;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-#drop-zones-container {
-    display: flex;
-    justify-content: space-between;
-    gap: 20px;
-}
-
-.drop-zone {
-    flex: 1;
-    min-height: 200px;
-    padding: 15px;
-    border: 3px dashed #ccc;
-    border-radius: 10px;
-    background-color: #fff;
-    transition: border-color 0.3s;
-    text-align: center;
-}
-
-.drop-zone.drag-over {
-    border-color: #4CAF50;
-    background-color: #e6ffe6;
-}
-
-.dropped-piece {
-    display: block; 
-    margin: 8px auto;
-    padding: 5px 10px;
-    background-color: #4CAF50; 
+    padding: 10px 15px;
+    background-color: #ff7f50;
     color: white;
-    border-radius: 15px;
-    font-weight: normal;
-    cursor: default;
-    box-shadow: none;
+    border-radius: 5px;
+    cursor: grab;
+    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
 }
 
-
-/* --- 구성주의 미션 (지식 공유 멘토) --- */
-#mentor-scenario {
-    border: 1px solid #ccc;
-    padding: 20px;
-    border-radius: 10px;
-    background-color: #f9f9f9;
-}
-
-#mentee-area {
-    display: flex;
-    align-items: flex-start;
-    justify-content: center;
-    gap: 15px;
-    margin-bottom: 20px;
-}
-
-#mentee-character {
-    font-size: 1.1em;
-    font-weight: bold;
-    color: #e67e22; 
-    padding-top: 5px;
-}
-
+/* 구성주의 */
 .dialogue-box {
-    flex: 1;
-    text-align: left;
-    background: #fff;
-    border: 1px solid #ddd;
-    padding: 15px;
+    padding: 20px;
+    border: 1px solid #28a745;
     border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    background-color: #e6ffe9;
+    width: 100%;
+    text-align: left;
 }
-
+.mentee-text {
+    font-style: italic;
+    color: #28a745;
+}
 #scaffolding-choices {
     display: flex;
     flex-direction: column;
+    width: 100%;
     gap: 10px;
-    margin-top: 25px;
 }
-
-.scaffolding-button {
-    background-color: #3498db;
-    color: white;
-    border: none;
-    padding: 12px;
-    border-radius: 6px;
-    cursor: pointer;
+#scaffolding-choices button {
     text-align: left;
-    transition: background-color 0.3s;
+    background-color: #28a745;
+    color: white;
+}
+#mentor-result-message strong {
+    color: #28a745;
 }
 
-.scaffolding-button:hover {
-    background-color: #2980b9;
-}
-
-.scaffolding-button:disabled {
-    background-color: #ccc;
-    cursor: not-allowed;
-}
-
-/* --- 교환소 모달 (기존 스타일 유지) --- */
+/* 모달 및 오버레이 */
 .modal-overlay {
     position: fixed;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    background-color: rgba(0, 0, 0, 0.7);
+    background: rgba(0, 0, 0, 0.7);
     display: flex;
     justify-content: center;
     align-items: center;
-    z-index: 2000;
+    z-index: 1000;
 }
-
 .modal-content {
-    background-color: white;
+    background: white;
     padding: 30px;
     border-radius: 10px;
-    width: 90%;
-    max-width: 500px;
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+    max-height: 90vh;
+    overflow-y: auto;
     text-align: center;
+}
+.exchange-item {
+    padding: 10px;
+    border: 1px solid #eee;
+    margin-bottom: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.exchange-item p {
+    margin: 0;
+}
+.reward-effect {
+    font-size: 0.9em;
+    color: #6c757d;
+}
+
+/* 십자말풀이 스타일 */
+#crossword-grid {
+    border: 2px solid #333;
+    table-layout: fixed;
+}
+.puzzle-cell {
+    width: 35px;
+    height: 35px;
+    border: 1px solid #555;
+    background-color: #eee;
+    padding: 0;
+    position: relative;
+    text-align: center;
+}
+.empty-cell {
+    width: 35px;
+    height: 35px;
+    background-color: #333; /* 채울 수 없는 칸 */
+    border: 1px solid #333;
+}
+.cell-number {
+    position: absolute;
+    top: 0px;
+    left: 2px;
+    font-size: 0.7em;
+    font-weight: bold;
+    color: #007bff;
+    z-index: 10;
+    background: #fff;
+    padding: 0 2px;
+    border-radius: 2px;
+}
+.puzzle-cell input {
+    width: 100%;
+    height: 100%;
+    border: none;
+    padding: 0;
+    margin: 0;
+    text-align: center;
+    font-size: 1.2em;
+    font-weight: bold;
+    background-color: #fff;
+    box-sizing: border-box;
+    outline: none;
+    text-transform: uppercase;
+}
+.puzzle-cell input.correct-fill {
+    background-color: #d4edda;
+    color: #155724;
+}
+
+#crossword-question-list button {
+    margin: 3px;
+    padding: 5px 10px;
+    font-size: 0.9em;
+    cursor: pointer;
+    background-color: #f0f0f0;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+#crossword-question-list button.selected {
+    background-color: #007bff;
+    color: white;
+}
+#crossword-question-list button.answered {
+    background-color: #28a745;
+    color: white;
+}
+
+#input-container {
+    display: flex;
+    gap: 10px;
+}
+#crossword-answer-input {
+    flex-grow: 1;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
 }
