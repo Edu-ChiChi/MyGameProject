@@ -18,7 +18,7 @@ const abandonMissionButton = document.getElementById('abandon-mission-button');
 const resolutionArea = document.getElementById('resolution-area');
 const restartButton = document.getElementById('restart-button');
 const resolutionMessage = document.getElementById('resolution-message');
-const resolutionEffect = document.getElementById('resolution-effect');
+// resolutionEffect 제거됨
 const restartButtonSelection = document.getElementById('restart-button-selection');
 
 // 미션별 컨테이너
@@ -72,20 +72,18 @@ function updateResolutionScreen(strategy) {
     
     document.querySelector('#resolution-area h2').textContent = `🎉 미션 성공! ${strategyName} 전략 결과`;
 
+    // '이론적 학습 전이 효과' 관련 멘트가 제거되고, 학생의 감사를 담은 해결 메시지만 남습니다.
     if (strategy === 'behaviorism') {
         resolutionMessage.innerHTML = `와, 정말 감사합니다! <strong>'습관의 저금통'</strong>을 체험해 보니 공부가 막막하게 느껴졌던 이유를 알 것 같아요. 작은 목표부터 보상을 받으면서 시작하는 방법을 알았으니, 이제 집중해서 공부할 수 있을 것 같아요!`;
-        resolutionEffect.textContent = `칭찬과 보상을 통해 '공부 습관'이라는 긍정적 행동이 강화되었습니다. 학습 행동이 보상으로 이어진다는 것을 직접 체험했습니다.`;
     } else if (strategy === 'cognitivism') {
         resolutionMessage.innerHTML = `와, 정말 감사합니다! <strong>'개념 연결하기 퍼즐'</strong>을 풀어 보니 공부할 내용이 많아서 막막했던 고민이 해결됐어요. 복잡한 내용을 묶어서 정리하는 법을 알았으니, 이제 어디서부터 시작해야 할지 알 것 같아요!`;
-        resolutionEffect.textContent = `정보를 체계적으로 분류하고 연결하는 능력(정보 처리, 스키마)이 향상되었습니다.`;
     } else if (strategy === 'constructivism') {
         const result = constructivismScenarios[0].choices.find(c => c.id === gameState.constructivismChoiceId);
-        resolutionMessage.innerHTML = `와, 정말 감사합니다! 제가 가진 고민이 해결되는 것 같아요. 이제 어떻게 공부해야 할지 알 것 같아요!`;
-        resolutionEffect.innerHTML = `당신은 <strong>${result.reward.badge}</strong>를 획득했습니다! 다른 사람에게 지식을 설명하고 가르치는 과정을 통해 자신의 지식이 더욱 명료해지는 **'학습 전이 효과'**를 얻었습니다.`;
+        // 구성주의 미션의 뱃지 정보는 해결 메시지 안에 통합되었습니다.
+        resolutionMessage.innerHTML = `와, 정말 감사합니다! 제가 가진 고민이 해결되는 것 같아요. 이제 어떻게 공부해야 할지 알 것 같아요! (획득 뱃지: <strong>${result.reward.badge}</strong>)`;
     } else if (strategy === 'crossword') {
          document.querySelector('#resolution-area h2').textContent = `🎉 단원 마무리 완료! 학습 전략 종합`;
          resolutionMessage.innerHTML = `모든 전략을 체험하고 단원 마무리 십자말풀이까지 완료했습니다! 이제 학습에 대한 자신만의 해답을 찾았을 것입니다!`;
-         resolutionEffect.textContent = `다양한 학습 전략을 이해하고 핵심 개념을 최종적으로 점검함으로써, 스스로 학습 방향을 설정하는 능력이 향상되었습니다.`;
     }
 }
 
