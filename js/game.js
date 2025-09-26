@@ -1,4 +1,4 @@
-// js/game.js (최종 버전: 모든 로직, 데이터, 기능 통합 완료 - 십자말풀이 로직 수정됨)
+// js/game.js (롤백 버전: 모든 로직, 데이터, 기능 통합, 십자말풀이 이전 상태로 복원)
 
 // --------------------------------------------------
 // 0. 게임 상태 및 데이터 정의 (모든 데이터 통합)
@@ -210,22 +210,23 @@ function initializeGame() {
     }
 
     // ----------------------
-    // 3.3. 십자말풀이 이벤트 (독립 미션) - ⭐수정된 로직⭐
+    // 3.3. 십자말풀이 이벤트 (독립 미션) - ⭐롤백된 로직⭐
     // ----------------------
     
     // 초기 화면 십자말풀이 버튼
-    if (startCrosswordButtonInitial && crosswordModal) {
-        startCrosswordButtonInitial.addEventListener('click', () => {
+    startCrosswordButtonInitial.addEventListener('click', () => {
+        // 이 부분이 문제의 원인이었을 수 있습니다. 이제 롤백되었습니다.
+        if (crosswordModal) {
             crosswordModal.style.display = 'flex';
             // drawCrosswordGrid(); // 외부 십자말풀이 로직 호출을 가정
-        });
-    }
+        }
+    });
     
     // 십자말풀이 모달 닫기 (진행 상황 초기화 확인)
-    if (closeCrosswordModal && crosswordModal) {
+    if (closeCrosswordModal) {
         closeCrosswordModal.addEventListener('click', () => {
             if (confirm("현재까지의 진행 상황은 저장되지 않습니다. 다시 풀게 됩니다. 고민 화면으로 복귀합니다.")) {
-                crosswordModal.style.display = 'none';
+                if (crosswordModal) crosswordModal.style.display = 'none';
                 showScreen('initial-problem-area'); 
             }
         });
