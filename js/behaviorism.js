@@ -1,15 +1,19 @@
 // js/behaviorism.js
 
 // --------------------------------------------------
-// 💡 행동주의 미션 로직 (입력 창 제거 버전)
+// 💡 행동주의 미션 로직
 // --------------------------------------------------
+// (NOTE: data.js의 gameState와 behaviorismTasks를 사용합니다.)
 
 const currentTokensDisplay = document.getElementById('current-tokens');
 const taskCardContainer = document.getElementById('task-card-container');
 
 // 미션 시작 시 호출 (game.js에서 호출됨)
-function loadBehaviorismMission() {
-    // 1. 작업 카드 새로고침
+window.loadBehaviorismMission = function() {
+    // 1. 상태 표시 업데이트
+    currentTokensDisplay.textContent = gameState.tokens;
+    
+    // 2. 작업 카드 새로고침
     currentTasks = [];
     // 무작위로 섞어 2개의 카드만 사용
     const reinforcementTasks = [...behaviorismTasks.filter(t => t.type === 'reinforcement')].sort(() => 0.5 - Math.random());
@@ -25,59 +29,53 @@ function loadBehaviorismMission() {
         if (reinforcementTasks.length > 0) currentTasks.push(reinforcementTasks.pop());
         else if (punishmentTasks.length > 0) currentTasks.push(punishmentTasks.pop());
     }
-    
-    // 최종 2개 카드 무작위 재배치
-    currentTasks.sort(() => 0.5 - Math.random()); 
 
-    taskCardContainer.innerHTML = currentTasks.map((task, index) => `
-        <div class="task-card">
-            <p><strong>${task.type === 'reinforcement' ? '✅ 좋은 습관:' : '❌ 나쁜 습관:'}</strong> ${task.title}</p>
-            <button data-task-index="${index}" class="action-button">
-                ${task.type === 'reinforcement' ? '선택 (집중력 코인 +1)' : '선택 (집중력 코인 -1)'}
-            </button>
-        </div>
-    `).join('');
-
-    // 이벤트 리스너 재할당
-    document.querySelectorAll('#task-card-container button').forEach(button => {
-        button.addEventListener('click', (e) => {
-            const taskIndex = parseInt(e.currentTarget.dataset.taskIndex);
-            handleTaskClick(taskIndex);
-        });
-    });
-
-    // 2. 상태 표시
-    currentTokensDisplay.textContent = gameState.tokens;
+    renderTaskCards();
 }
 
-// 작업 버튼 클릭 처리
-function handleTaskClick(taskIndex) {
+function renderTaskCards() {
+    taskCardContainer.innerHTML = '';
+    currentTasks.forEach((task, index) => {
+        const card = document.createElement('div');
+        card.className = `task-card ${task.type}`;
+        card.innerHTML = `
+            <p>${task.title}</p>
+            <button class="action-button ${task.correct ? 'success' : 'danger'}" data-index="${index}">
+                ${task.correct ? `코인 +${task.value}` : `코인 ${task.value}`}
+            </button>
+        `;
+        taskCardContainer.appendChild(card);
+    });
+
+    // 이벤트 리스너 할당
+    document.querySelectorAll('.task-card button').forEach(button => {
+        button.addEventListener('click', handleTaskSelection);
+    });
+}
+
+// 작업 선택 처리
+function handleTaskSelection(e) {
+    const taskIndex = parseInt(e.currentTarget.dataset.index);
     const task = currentTasks[taskIndex];
+
+    // 코인 증가/감소 처리
+    let earnedTokens = task.value;
     
-    let value = task.value;
-    let message = '';
-
-    // 강화 작업은 토큰 획득 (+1), 처벌 작업은 토큰 차감 (-1)
-    if (task.type === 'reinforcement') {
-        value = gameState.isBuffed ? task.value * 2 : task.value;
-        message = `👍 ${task.title} 선택! 집중력 코인 ${value}개를 획득했습니다!`;
-    } else {
-        value = task.value; // -1
-        message = `🚨 ${task.title} 선택! 집중력 코인 1개가 차감됩니다.`;
-    }
-
-    // 토큰 업데이트
-    gameState.tokens += value;
+    // 포션 버프 적용 (시뮬레이션 용도로 사용하지 않음. 실제로는 팝업 후 제거)
+    // if (gameState.isBuffed && task.correct) {
+    //     earnedTokens *= 2;
+    //     gameState.isBuffed = false; // 버프 사용 후 제거
+    // }
+    
+    gameState.tokens += earnedTokens;
+    
+    // 코인 표시 업데이트
     currentTokensDisplay.textContent = gameState.tokens;
 
-    // 버프 상태 해제
-    if (gameState.isBuffed) {
-        gameState.isBuffed = false;
-    }
+    // 피드백 제공
+    alert(`[${task.title}]를 실천했습니다! 코인 ${earnedTokens}개를 획득했습니다. (현재 코인: ${gameState.tokens})`);
     
-    alert(message);
-    
-    // 미션 완료 체크
+    // 미션 완료 여부 체크
     checkBehaviorismMissionCompletion(); 
     
     // 카드 내용 재할당 (새로운 카드 생성)
@@ -86,42 +84,25 @@ function handleTaskClick(taskIndex) {
 
 // 미션 완료 체크
 function checkBehaviorismMissionCompletion() {
-    if (gameState.tokens >= 5) {
-        alert(`🎉 행동주의 미션 완료! 5 코인을 모았습니다! '습관의 저금통'을 통해 학습 습관을 만드는 방법을 깨달았습니다!`); 
-        gameState.tokens = 0; 
-        currentTokensDisplay.textContent = gameState.tokens;
-        
-        // 미션 완료 후 해결창으로 이동
-        showScreen('resolution-area', 'behaviorism'); 
-    }
+    // 시나리오상 5코인 이상 시 미션 완료로 간주하고,
+    // 실제 미션 완료는 '시뮬레이션 완료' 버튼으로 처리하도록 game.js에서 결정
+    
+    // 시뮬레이션 완료 버튼 클릭 시 처리
 }
 
-// 코인 교환소 처리
-function handleExchange(cost, itemId) {
-    if (gameState.tokens < cost) {
-        alert("코인이 부족합니다.");
-        return;
-    }
-
-    gameState.tokens -= cost;
-    document.getElementById('modal-current-tokens').textContent = gameState.tokens;
-    currentTokensDisplay.textContent = gameState.tokens;
-
-    if (itemId === 'potion') {
-        gameState.isBuffed = true;
-        alert("개념 요약 포션을 사용했습니다! 다음 목표 달성 시 코인을 2배 획득합니다!");
-    } else if (itemId === 'focus') {
-        // 집중력 강화 물약 (3코인) -> 미션 완료 코인(5코인)으로 즉시 전환
-        gameState.tokens += 5; 
-        alert("집중력 강화 물약을 사용했습니다! 즉시 미션 완료 코인(5코인)을 획득했습니다.");
-    } else if (itemId === 'preview') {
-        // 다음 단원 미리보기 요약 영상 (5코인) -> 미션 완료 처리
-        alert("다음 단원 미리보기 요약 영상을 획득했습니다. 단원 마무리 활동을 통해 미션을 완료합니다.");
-        // 여기서 바로 5포인트를 획득하여 미션 완료 로직을 호출 (코인 획득은 이미 cost에서 차감됨)
-    }
+// '미션 시뮬레이션 완료' 버튼 이벤트 (game.js에서 정의된 함수를 사용하지 않고 별도로 처리)
+document.addEventListener('DOMContentLoaded', () => {
+    const completeButton = document.getElementById('simulate-behaviorism-completion');
     
-    document.getElementById('exchange-modal').style.display = 'none';
-    
-    // 미션 완료 체크
-    checkBehaviorismMissionCompletion(); 
-}
+    // 최종 완료 버튼 연결
+    if (completeButton) {
+        completeButton.addEventListener('click', () => {
+            if (window.showScreen) {
+                alert("코인 5개를 모두 모아 미션을 완료합니다! (시뮬레이션)");
+                // 5코인 달성 가정 후 초기화
+                gameState.tokens = 0; 
+                window.showScreen('resolution-area', 'behaviorism');
+            }
+        });
+    }
+});

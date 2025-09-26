@@ -13,8 +13,8 @@ const mentorPoints = document.getElementById('mentor-points');
 const completeMentorMissionButton = document.getElementById('complete-mentor-mission');
 
 // 미션 시작 시 호출 (game.js에서 호출됨)
-function loadConstructivismMission() {
-    const scenario = constructivismScenarios[0];
+window.loadConstructivismMission = function() {
+    const scenario = constructivismScenarios[0]; // data.js의 constructivismScenarios 사용
     
     // 1. 초기 대화 설정
     menteeDialogue.textContent = scenario.text;
@@ -37,6 +37,12 @@ function loadConstructivismMission() {
             handleScaffoldingChoice(choiceId);
         });
     });
+
+    // 완료 버튼 연결
+    if (completeMentorMissionButton) {
+        completeMentorMissionButton.removeEventListener('click', handleMissionCompletion);
+        completeMentorMissionButton.addEventListener('click', handleMissionCompletion);
+    }
 }
 
 // 비계 선택지 클릭 처리
@@ -50,17 +56,17 @@ function handleScaffoldingChoice(choiceId) {
     // 2. 결과 표시
     menteeReactionText.textContent = choice.reaction;
     mentorBadge.textContent = choice.reward.badge;
-    mentorPoints.textContent = choice.reward.points;
+    mentorPoints.textContent = choice.reward.points; // 포인트를 표시하지만 실제 게임 로직은 미구현
     mentorResultMessage.style.display = 'block';
 
-    // 3. 상태 저장
+    // 3. 상태 저장 (game.js의 resolution-area에서 사용)
     gameState.constructivismChoiceId = choiceId;
+}
 
-    // 4. 미션 완료 버튼 이벤트 연결
-    completeMentorMissionButton.onclick = () => {
-        alert(`🎉 구성주의 미션 완료! 지식 공유 멘토링을 통해 자신의 지식을 확고히 하는 방법을 깨달았습니다!`); 
-        
-        // 미션 완료 후 해결창으로 이동
-        showScreen('resolution-area', 'constructivism');
-    };
+// 미션 완료 처리 (결과 창으로 이동)
+function handleMissionCompletion() {
+    if (window.showScreen) {
+        alert("친구의 고민을 성공적으로 해결하고 멘토 뱃지를 획득했습니다!");
+        window.showScreen('resolution-area', 'constructivism');
+    }
 }
