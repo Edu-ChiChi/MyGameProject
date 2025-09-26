@@ -18,7 +18,6 @@ const abandonMissionButton = document.getElementById('abandon-mission-button');
 const resolutionArea = document.getElementById('resolution-area');
 const restartButton = document.getElementById('restart-button');
 const resolutionMessage = document.getElementById('resolution-message');
-// resolutionEffect 제거됨
 const restartButtonSelection = document.getElementById('restart-button-selection');
 
 // 미션별 컨테이너
@@ -70,6 +69,7 @@ function updateResolutionScreen(strategy) {
     // 최종 메시지 구성
     const strategyName = strategyMap[strategy];
     
+    // '이론적 학습 전이 효과' 제목 제거
     document.querySelector('#resolution-area h2').textContent = `🎉 미션 성공! ${strategyName} 전략 결과`;
 
     // '이론적 학습 전이 효과' 관련 멘트가 제거되고, 학생의 감사를 담은 해결 메시지만 남습니다.
@@ -112,7 +112,7 @@ function startMission(strategy) {
 // --------------------------------------------------
 
 function initializeGame() {
-    // 🚀 전문가 말풍선 고정 메시지 설정 (요구사항 반영)
+    // 🚀 전문가 말풍선 고정 메시지 설정 (최종 요구사항 반영)
     expertBubbles.behaviorism.textContent = "학습은 자극과 반응 행동을 연결하는 과정입니다. 집중력이 문제라면, 보상으로 학습 습관을 만들어 보세요! 목표를 달성할 때마다 포인트를 드릴게요!";
     expertBubbles.cognitivism.textContent = "학습은 이미 아는 정보를 새로운 정보와 연결하는 과정입니다. 방대한 양이 고민이라면, 효율적인 정리가 필요합니다! 정보를 머릿속에 체계적으로 저장하는 법을 알려드릴게요!";
     expertBubbles.constructivism.textContent = "학습은 학생 스스로 중요하다고 생각하는 내용을 자기 방식대로 이해하는 과정입니다. 혼자서 힘들다면, 협력의 힘을 빌려보세요! 친구와 함께 배우는 방법을 알려드릴게요.";
@@ -142,7 +142,7 @@ function initializeGame() {
     // 미션 포기 버튼 (확인 메시지 포함)
     abandonMissionButton.addEventListener('click', () => {
         if (confirm("현재 진행 중인 미션을 포기하시겠어요? 진행 상황은 저장되지 않습니다.")) {
-            // 게임 상태 초기화
+            // 게임 상태 초기화 (토큰 등)
             gameState.tokens = 0;
             gameState.correctCognitivismDrops = 0;
             gameState.isBuffed = false;
@@ -152,12 +152,18 @@ function initializeGame() {
     });
 
     // ----------------------
-    // 3.2. 행동주의 교환소 이벤트
+    // 3.2. 행동주의 교환소 이벤트 (최신 반영: 기능 미구현 차단)
     // ----------------------
     document.getElementById('open-exchange-button').addEventListener('click', () => {
-        document.getElementById('modal-current-tokens').textContent = gameState.tokens;
-        document.getElementById('exchange-modal').style.display = 'flex';
+        // 교환소 버튼 클릭 시 기능 미구현 안내 알림 출력
+        alert("아쉽게도 교환소 구매 기능은 아직 구현되지 않았습니다. 다음 업데이트를 기대해 주세요! 😢");
+        
+        // **기존 교환소 모달 관련 로직은 실행되지 않도록 주석 처리:**
+        // document.getElementById('modal-current-tokens').textContent = gameState.tokens;
+        // document.getElementById('exchange-modal').style.display = 'flex';
     });
+    
+    // (참고: close-modal-button과 exchange-button 관련 이벤트 리스너는 그대로 유지됩니다.)
     document.getElementById('close-modal-button').addEventListener('click', () => {
         document.getElementById('exchange-modal').style.display = 'none';
     });
@@ -166,7 +172,8 @@ function initializeGame() {
         button.addEventListener('click', (e) => {
             const cost = parseInt(e.currentTarget.dataset.cost);
             const id = e.currentTarget.dataset.id;
-            handleExchange(cost, id); 
+            // handleExchange 함수는 주석 처리된 상태로 유지 (구현 시 활성화)
+            // handleExchange(cost, id); 
         });
     });
 
