@@ -1,7 +1,7 @@
 // js/behaviorism.js
 
 // --------------------------------------------------
-// 💡 행동주의 미션 로직
+// 💡 행동주의 미션 로직 (입력 창 제거)
 // --------------------------------------------------
 
 const currentTokensDisplay = document.getElementById('current-tokens');
@@ -17,19 +17,22 @@ function loadBehaviorismMission() {
 
     taskCardContainer.innerHTML = currentTasks.map((task, index) => `
         <div class="task-card">
-            <p>${task.type === 'reinforcement' ? '✅ 좋은 습관:' : '❌ 나쁜 습관:'} ${task.title}</p>
-            <input type="text" id="task-input-${index}" placeholder="실천 내용을 간단히 입력하세요.">
-            <button id="task-button-${index}" data-task-index="${index}" class="action-button">
-                ${task.type === 'reinforcement' ? '목표 달성 확인 (+1 코인)' : '나쁜 습관 선택 (-1 코인)'}
+            <p><strong>${task.type === 'reinforcement' ? '✅ 좋은 습관:' : '❌ 나쁜 습관:'}</strong> ${task.title}</p>
+            <button data-task-index="${index}" class="action-button">
+                ${task.type === 'reinforcement' ? '선택 (집중력 코인 +1)' : '선택 (집중력 코인 -1)'}
             </button>
         </div>
     `).join('');
 
     // 이벤트 리스너 재할당
     currentTasks.forEach((_, index) => {
-        document.getElementById(`task-button-${index}`).addEventListener('click', (e) => {
-            const input = document.getElementById(`task-input-${index}`);
-            handleTaskClick(index, e.currentTarget, input);
+        document.querySelectorAll('.task-card button').forEach(button => {
+             if (parseInt(button.dataset.taskIndex) === index) {
+                 // handleTaskClick 호출 시 인풋 요소는 더 이상 전달하지 않습니다.
+                 button.addEventListener('click', (e) => {
+                     handleTaskClick(index); 
+                 });
+             }
         });
     });
 
@@ -38,21 +41,18 @@ function loadBehaviorismMission() {
 }
 
 // 작업 버튼 클릭 처리
-function handleTaskClick(taskIndex, button, inputElement) {
+function handleTaskClick(taskIndex) {
     const task = currentTasks[taskIndex];
     
-    if (inputElement.value.trim().length === 0) {
-        alert("실천 내용을 입력해 주세요.");
-        return;
-    }
-
+    // 학생의 입력 내용 확인 로직 (제거됨)
+    
     let value = task.value;
     let message = '';
 
     // 강화 작업은 토큰 획득 (+1), 처벌 작업은 토큰 차감 (-1)
     if (task.type === 'reinforcement') {
         value = gameState.isBuffed ? task.value * 2 : task.value;
-        message = `👍 ${task.title} 실천! 집중력 코인 ${value}개를 획득했습니다!`;
+        message = `👍 ${task.title} 선택! 집중력 코인 ${value}개를 획득했습니다!`;
     } else {
         value = task.value; // -1
         message = `🚨 ${task.title} 선택! 집중력 코인 1개가 차감됩니다.`;
@@ -72,9 +72,8 @@ function handleTaskClick(taskIndex, button, inputElement) {
     // 미션 완료 체크
     updateTokens(); 
     
-    // UI 초기화
-    inputElement.value = '';
-    loadBehaviorismMission(); // 카드 내용 재할당
+    // 카드 내용 재할당
+    loadBehaviorismMission(); 
 }
 
 // 미션 완료 및 코인 교환 처리
@@ -89,7 +88,7 @@ function updateTokens() {
     }
 }
 
-// 코인 교환소 처리
+// 코인 교환소 처리 (이 로직은 변경하지 않고 유지합니다.)
 function handleExchange(cost, itemId) {
     if (gameState.tokens < cost) {
         alert("코인이 부족합니다.");
@@ -110,7 +109,7 @@ function handleExchange(cost, itemId) {
     } else if (itemId === 'preview') {
         // 다음 단원 미리보기 요약 영상 (5코인) -> 미션 완료 처리
         alert("다음 단원 미리보기 요약 영상을 획득했습니다. 단원 마무리 활동을 통해 미션을 완료합니다.");
-        updateTokens(); // 5코인 획득과 동시에 완료 체크
+        updateTokens(); 
     }
     
     document.getElementById('exchange-modal').style.display = 'none';
