@@ -4,17 +4,15 @@
 // 💡 구성주의 미션 로직 (비계 제공)
 // --------------------------------------------------
 
-const menteeDialogue = document.getElementById('mentee-dialogue');
-const scaffoldingChoices = document.getElementById('scaffolding-choices');
-const mentorResultMessage = document.getElementById('mentor-result-message');
-const menteeReactionText = document.getElementById('mentee-reaction-text');
-const mentorBadge = document.getElementById('mentor-badge');
-const mentorPoints = document.getElementById('mentor-points');
-const completeMentorMissionButton = document.getElementById('complete-mentor-mission');
-
 // 미션 시작 시 호출 (game.js에서 호출됨)
 window.loadConstructivismMission = function() {
-    const scenario = constructivismScenarios[0]; // data.js의 constructivismScenarios 사용
+    const menteeDialogue = document.getElementById('mentee-dialogue');
+    const scaffoldingChoices = document.getElementById('scaffolding-choices');
+    const mentorResultMessage = document.getElementById('mentor-result-message');
+    const completeMentorMissionButton = document.getElementById('complete-mentor-mission');
+    
+    // data.js의 constructivismScenarios 사용
+    const scenario = constructivismScenarios[0]; 
     
     // 1. 초기 대화 설정
     menteeDialogue.textContent = scenario.text;
@@ -28,7 +26,6 @@ window.loadConstructivismMission = function() {
     
     // 3. 이벤트 리스너 재할당 (버튼에 이벤트 연결)
     document.querySelectorAll('#scaffolding-choices button').forEach(button => {
-        // 이전 리스너 제거 후 추가 (중복 방지)
         const newButton = button.cloneNode(true);
         button.parentNode.replaceChild(newButton, button);
         
@@ -51,9 +48,15 @@ function handleScaffoldingChoice(choiceId) {
     const choice = scenario.choices.find(c => c.id === choiceId);
     
     // 1. 선택지 숨기기
+    const scaffoldingChoices = document.getElementById('scaffolding-choices');
     scaffoldingChoices.style.display = 'none';
 
     // 2. 결과 표시
+    const mentorResultMessage = document.getElementById('mentor-result-message');
+    const menteeReactionText = document.getElementById('mentee-reaction-text');
+    const mentorBadge = document.getElementById('mentor-badge');
+    const mentorPoints = document.getElementById('mentor-points');
+
     menteeReactionText.textContent = choice.reaction;
     mentorBadge.textContent = choice.reward.badge;
     mentorPoints.textContent = choice.reward.points; // 포인트를 표시하지만 실제 게임 로직은 미구현
