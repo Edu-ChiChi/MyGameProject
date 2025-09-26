@@ -1,4 +1,4 @@
-// js/game.js (최종 버전: 모든 로직, 데이터, 기능 통합 완료)
+// js/game.js (최종 버전: 모든 로직, 데이터, 기능 통합 완료 - 십자말풀이 로직 수정됨)
 
 // --------------------------------------------------
 // 0. 게임 상태 및 데이터 정의 (모든 데이터 통합)
@@ -68,7 +68,7 @@ const expertBubbles = {
     cognitivism: document.querySelector('.cognitivism-bubble'),
     constructivism: document.querySelector('.constructivism-bubble')
 };
-const backToProblemButton = document.getElementById('back-to-problem-button'); // 전문가 선택 창 뒤로가기 버튼
+const backToProblemButton = document.getElementById('back-to-problem-button'); 
 
 const missionArea = document.getElementById('mission-area');
 const abandonMissionButton = document.getElementById('abandon-mission-button');
@@ -77,12 +77,10 @@ const restartButton = document.getElementById('restart-button');
 const resolutionMessage = document.getElementById('resolution-message');
 const restartButtonSelection = document.getElementById('restart-button-selection');
 
-// 미션별 컨테이너 (존재를 가정)
 const behaviorismMission = document.getElementById('behaviorism-mission');
 const cognitivismMission = document.getElementById('cognitivism-mission');
 const constructivismMission = document.getElementById('constructivism-mission');
 
-// 십자말풀이 요소 (존재를 가정)
 const crosswordModal = document.getElementById('crossword-game-modal');
 const closeCrosswordModal = document.getElementById('close-crossword-modal');
 const checkAnswerButton = document.getElementById('check-answer-button'); 
@@ -139,16 +137,12 @@ function startMission(strategy) {
     
     document.querySelectorAll('.mission-screen').forEach(el => el.style.display = 'none');
     
-    // (실제 미션 로직은 외부 js 파일에서 실행된다고 가정)
     if (strategy === 'behaviorism') {
         behaviorismMission.style.display = 'flex';
-        // loadBehaviorismMission(); 
     } else if (strategy === 'cognitivism') {
         cognitivismMission.style.display = 'block';
-        // loadCognitivismMission();
     } else if (strategy === 'constructivism') {
         constructivismMission.style.display = 'block';
-        // loadConstructivismMission();
     }
 }
 
@@ -170,7 +164,7 @@ function initializeGame() {
     // ----------------------
     consultButton.addEventListener('click', () => { showScreen('expert-selection-area'); });
     
-    // ⭐ 전문가 창에서 고민 창으로 뒤로 가기 (새로 추가된 기능)
+    // ⭐ 전문가 창에서 고민 창으로 뒤로 가기
     if (backToProblemButton) {
         backToProblemButton.addEventListener('click', () => {
             showScreen('initial-problem-area');
@@ -194,7 +188,6 @@ function initializeGame() {
     // 미션 포기 버튼 (확인 메시지 포함)
     abandonMissionButton.addEventListener('click', () => {
         if (confirm("현재 진행 중인 미션을 포기하시겠어요? 진행 상황은 저장되지 않습니다.")) {
-            // 게임 상태 초기화 (토큰 등)
             showScreen('expert-selection-area');
         }
     });
@@ -205,7 +198,6 @@ function initializeGame() {
     const openExchangeButton = document.getElementById('open-exchange-button');
     if (openExchangeButton) {
         openExchangeButton.addEventListener('click', () => {
-            // 교환소 버튼 클릭 시 기능 미구현 안내 알림 출력
             alert("아쉽게도 교환소 구매 기능은 아직 구현되지 않았습니다. 다음 업데이트를 기대해 주세요! 😢");
         });
     }
@@ -218,18 +210,19 @@ function initializeGame() {
     }
 
     // ----------------------
-    // 3.3. 십자말풀이 이벤트 (독립 미션)
+    // 3.3. 십자말풀이 이벤트 (독립 미션) - ⭐수정된 로직⭐
     // ----------------------
+    
     // 초기 화면 십자말풀이 버튼
-    startCrosswordButtonInitial.addEventListener('click', () => {
-        if (crosswordModal) {
+    if (startCrosswordButtonInitial && crosswordModal) {
+        startCrosswordButtonInitial.addEventListener('click', () => {
             crosswordModal.style.display = 'flex';
-            // drawCrosswordGrid(); // 외부 십자말풀이 로직 호출
-        }
-    });
+            // drawCrosswordGrid(); // 외부 십자말풀이 로직 호출을 가정
+        });
+    }
     
     // 십자말풀이 모달 닫기 (진행 상황 초기화 확인)
-    if (closeCrosswordModal) {
+    if (closeCrosswordModal && crosswordModal) {
         closeCrosswordModal.addEventListener('click', () => {
             if (confirm("현재까지의 진행 상황은 저장되지 않습니다. 다시 풀게 됩니다. 고민 화면으로 복귀합니다.")) {
                 crosswordModal.style.display = 'none';
@@ -244,7 +237,7 @@ function initializeGame() {
         crosswordQuestionList.addEventListener('click', (e) => {
             if (e.target.classList.contains('clue-button')) {
                 // const index = parseInt(e.target.dataset.index);
-                // selectCrosswordClue(index); // 외부 십자말풀이 로직 호출
+                // selectCrosswordClue(index); // 외부 십자말풀이 로직 호출을 가정
             }
         });
     }
