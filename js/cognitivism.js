@@ -103,7 +103,7 @@ function handleDrop(e) {
                  targetZone.classList.add('all-correct');
             }
 
-            // 미션 완료 확인 (12개 모두 성공 시에만 화면 전환 가능)
+            // 미션 완료 확인 (9개 모두 성공 시에만 화면 전환 가능)
             if (gameState.correctCognitivismDrops === gameState.totalCognitivismPieces) {
                 // 기존 arert 와 window.showScreen 호출 주석처리
                 // alert("🎉 모든 개념을 올바르게 연결했습니다! 이제 복잡한 내용을 만날 때마다 이 전략을 적용해 기억의 방을 활성화해 보세요!");
@@ -135,6 +135,7 @@ function checkCognitivismMissionCompletion() {
         completeCognitivismButton.textContent = `개념 퍼즐 완료 시 활성화 (${currentDrops}/${requiredDrops})`;
     }
 };
+
 
 // '미션 시뮬레이션 완료' 버튼 이벤트 연결
 document.addEventListener('DOMContentLoaded', () => {

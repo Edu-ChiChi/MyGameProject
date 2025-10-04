@@ -31,23 +31,20 @@ let currentTasks = [];
 // 🚀 2. 인지주의 미션 데이터 (업데이트 완료)
 // --------------------------------------------------
 const cognitivismPieces = [
-    // 행동주의 (4개)
+    // 행동주의 (3개)
     { id: 'p1', name: '자극', category: '행동주의' },
-    { id: 'p2', name: '반응', category: '행동주의' },
-    { id: 'p3', name: '처벌', category: '행동주의' },
-    { id: 'p4', name: '토큰 경제', category: '행동주의' },
+    { id: 'p2', name: '처벌', category: '행동주의' },
+    { id: 'p3', name: '토큰 경제', category: '행동주의' },
     
-    // 인지주의 (4개)
-    { id: 'p5', name: '인출', category: '인지주의' }, 
-    { id: 'p6', name: '전이', category: '인지주의' }, 
-    { id: 'p7', name: '부호화', category: '인지주의' },
-    { id: 'p8', name: '초인지(메타인지)', category: '인지주의' },
+    // 인지주의 (3개)
+    { id: 'p4', name: '인출', category: '인지주의' }, 
+    { id: 'p5', name: '전이', category: '인지주의' }, 
+    { id: 'p6', name: '초인지(메타인지)', category: '인지주의' },
     
-    // 구성주의 (4개)
-    { id: 'p9', name: '동화', category: '구성주의' },
-    { id: 'p10', name: '학습자 중심 학습', category: '구성주의' },
-    { id: 'p11', name: '비계', category: '구성주의' },
-    { id: 'p12', name: '비구조화된 문제', category: '구성주의' },
+    // 구성주의 (3개)
+    { id: 'p7', name: '비계', category: '구성주의' },
+    { id: 'p8', name: '학습자 중심 학습', category: '구성주의' },
+    { id: 'p9', name: '비구조화된 문제', category: '구성주의' },
 ];
 
 // --------------------------------------------------
