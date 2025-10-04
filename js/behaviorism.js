@@ -18,7 +18,7 @@ window.loadBehaviorismMission = function() {
     // 무작위로 섞어 2개의 카드만 사용
     const reinforcementTasks = [...behaviorismTasks.filter(t => t.type === 'reinforcement')].sort(() => 0.5 - Math.random());
     const punishmentTasks = [...behaviorismTasks.filter(t => t.type === 'punishment')].sort(() => 0.5 - Math.random());
-    
+
     // 최소 1개의 강화/처벌이 나오도록 조합
     currentTasks = [];
     if (reinforcementTasks.length > 0) currentTasks.push(reinforcementTasks.pop());
@@ -31,6 +31,9 @@ window.loadBehaviorismMission = function() {
     }
 
     renderTaskCards();
+
+    // 초기 로드 시 버튼 상태 설정
+    checkBehaviorismMissionCompletion();
 }
 
 function renderTaskCards() {
@@ -84,10 +87,21 @@ function handleTaskSelection(e) {
 
 // 미션 완료 체크
 function checkBehaviorismMissionCompletion() {
-    // 시나리오상 5코인 이상 시 미션 완료로 간주하고,
+    const completeButton = document.getElementById('simulate-behaviorism-completion');
+    if (!completeButton) return;
+
+    const requiredTokens = 5; // 완료 조건
+
+    if (gameState.tokens >= requiredTokens) {
+        completeButton.disabled = false; // 5개 이상이면 활성화
+        completeButton.textContent = "✅ 코인 5개 달성! 결과 확인하기";
+    } else {
+        completeButton.disabled = true; // 5개 미만이면 비활성화
+        completeButton.textContent = `코인 ${requiredTokens}개 달성 시 완료 가능 (${gameState.tokens}/${requiredTokens})`;
+    }
+    // 시나리오상 5코인 이상 시 미션 완료로 처리하고,
     // 실제 미션 완료는 '시뮬레이션 완료' 버튼으로 처리하도록 game.js에서 결정
     
-    // 시뮬레이션 완료 버튼 클릭 시 처리
 }
 
 // '미션 시뮬레이션 완료' 버튼 이벤트 (game.js에서 정의된 함수를 사용하지 않고 별도로 처리)
