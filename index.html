@@ -23,112 +23,113 @@
         </section>
 
         <section id="expert-selection-area" class="screen" style="display:none;">
-            <h2>Step 1: 전문가 선택</h2>
-            <p>당신의 고민을 해결해줄 학습 전략 전문가를 선택하세요.</p>
-            
+            <h2>고민 해결 전략 선택</h2>
             <div class="expert-list">
-                <div class="expert behaviorism-expert" data-strategy="behaviorism">
-                    <img src="img/expert-behaviorism.png" alt="행동주의 전문가 이미지">
-                    <h3>행동주의 전문가</h3>
-                    <p class="expert-motto">"학습은 습관이다. 반복과 보상으로 성취하라!"</p>
-                    <div class="expert-bubble behaviorism-bubble" style="display: none;">
-                        <p>작은 목표를 설정하고, 달성할 때마다 즉각적인 보상으로 습관을 형성하게 도와드릴게요.</p>
-                    </div>
+                <div class="expert" data-strategy="behaviorism">
+                    <div class="expert-bubble behaviorism-bubble"></div>
+                    <p>행동주의 전문가</p>
                 </div>
-                
-                <div class="expert cognitivism-expert" data-strategy="cognitivism">
-                    <img src="img/expert-cognitivism.png" alt="인지주의 전문가 이미지">
-                    <h3>인지주의 전문가</h3>
-                    <p class="expert-motto">"정보를 조직화하라. 기억의 구조를 이해하라!"</p>
-                    <div class="expert-bubble cognitivism-bubble" style="display: none;">
-                        <p>정보를 체계적으로 정리하고, 기억하는 방법을 가르쳐 드릴게요. 지식을 머릿속에 구조화하세요.</p>
-                    </div>
+                <div class="expert" data-strategy="cognitivism">
+                    <div class="expert-bubble cognitivism-bubble"></div>
+                    <p>인지주의 전문가</p>
                 </div>
-                
-                <div class="expert constructivism-expert" data-strategy="constructivism">
-                    <img src="img/expert-constructivism.png" alt="구성주의 전문가 이미지">
-                    <h3>구성주의 전문가</h3>
-                    <p class="expert-motto">"지식은 스스로 만든다. 협력과 비계로 성장하라!"</p>
-                    <div class="expert-bubble constructivism-bubble" style="display: none;">
-                        <p>친구들과 협력하여 문제를 해결하고, 필요한 도움(비계)을 제공받아 스스로 성장하는 경험을 하도록 안내할게요.</p>
-                    </div>
+                <div class="expert" data-strategy="constructivism">
+                    <div class="expert-bubble constructivism-bubble"></div>
+                    <p>구성주의 전문가</p>
                 </div>
             </div>
-            
-            <button id="back-to-problem-button" class="action-button secondary">이전 화면으로 돌아가기</button>
+            <div class="button-group">
+                <button id="back-to-problem-button" class="action-button secondary">고민 화면으로 복귀</button>
+                <button id="restart-button-selection" class="action-button secondary" style="display:none;">다른 전략 체험하기</button>
+            </div>
         </section>
 
         <section id="mission-area" class="screen" style="display:none;">
+            
             <div class="mission-header">
-                <h2 id="mission-title"></h2>
-                <button id="abandon-mission-button" class="action-button danger small">다른 전략 체험하기</button>
+                <h2>실전 미션 수행</h2>
+                <button id="abandon-mission-button" class="action-button danger">미션 포기</button>
             </div>
-            <div class="mission-content" id="current-mission-content">
-                <div id="behaviorism-mission" class="mission-screen" style="display:none;">
-                    <div class="info-bar">
-                        <p>현재 코인: <span id="current-tokens" class="token-display">0</span></p>
-                        <button id="open-exchange-button" class="action-button secondary small">행동주의 교환소</button>
+            
+            <div id="behaviorism-mission" class="mission-screen" style="display:none;">
+                <h3>📚 행동주의: 습관의 저금통</h3>
+                <div class="behaviorism-ui">
+                    <div class="token-display">
+                        <span class="token-label">현재 코인 (토큰)</span>
+                        <span id="current-tokens" class="token-value">0</span>
                     </div>
-                    <div id="task-card-container" class="task-card-container">
+                    <div class="task-area">
+                        <h4>오늘의 실천 목표 (코인을 획득하세요!)</h4>
+                        <div id="task-card-container" class="card-list">
                         </div>
-                    <button id="complete-behaviorism-mission" class="action-button primary full-width" style="margin-top: 20px;">시뮬레이션 완료</button>
+                    </div>
+                    <div class="exchange-area">
+                        <button id="open-exchange-button" class="action-button secondary">코인 교환소 (미구현)</button>
+                        <button id="simulate-behaviorism-completion" class="action-button primary">미션 시뮬레이션 완료</button>
+                    </div>
                 </div>
+            </div>
 
-                <div id="cognitivism-mission" class="mission-screen" style="display:none;">
-                    <h3>기억의 방 탈출: 개념 조각 맞추기 (Drag & Drop)</h3>
+            <div id="cognitivism-mission" class="mission-screen" style="display:none;">
+                <h3>🧩 인지주의: 개념 연결하기 퍼즐</h3>
+                <p>흩어져 있는 개념 조각들을 올바른 학습 이론 범주(행동주의, 인지주의, 구성주의)에 연결하여 기억의 방을 탈출하세요.</p>
+                
+                <div class="cognitivism-puzzle-area">
                     <div class="drop-zones-container">
-                        <div class="drop-zone" data-category="감각기억">
-                            <h4>감각기억</h4>
-                        </div>
-                        <div class="drop-zone" data-category="단기기억">
-                            <h4>단기기억</h4>
-                        </div>
-                        <div class="drop-zone" data-category="장기기억">
-                            <h4>장기기억</h4>
-                        </div>
+                        <div class="drop-zone" data-category="행동주의"><h4>행동주의</h4></div>
+                        <div class="drop-zone" data-category="인지주의"><h4>인지주의</h4></div>
+                        <div class="drop-zone" data-category="구성주의"><h4>구성주의</h4></div>
                     </div>
+                    <h4>개념 조각들</h4>
                     <div id="puzzle-pieces-container" class="puzzle-pieces-container">
-                        </div>
-                    <p class="tip-text">총 12개의 개념 조각을 올바른 기억 저장소에 넣어보세요. 모든 조각을 맞추면 탈출 성공입니다!</p>
-                    <button id="simulate-cognitivism-completion" class="action-button secondary full-width" style="margin-top: 20px;">건너뛰기 (디버그)</button>
+                    </div>
                 </div>
+                <button id="simulate-cognitivism-completion" class="action-button secondary" style="margin-top: 20px;">미션 시뮬레이션 완료</button>
+            </div>
+            
+            <div id="constructivism-mission" class="mission-screen" style="display:none;">
+                <h3>🤝 구성주의: 멘토링 비계 제공</h3>
+                <p>친구의 학습 고민을 듣고, 어떤 비계(Scaffolding)를 제공해야 친구가 스스로 해답을 찾을 수 있을지 선택해 보세요.</p>
 
-                <div id="constructivism-mission" class="mission-screen" style="display:none;">
-                    <div class="dialogue-box">
-                        <p class="mentee-line" id="mentee-dialogue">멘티의 고민이 여기에 표시됩니다.</p>
+                <div class="mentoring-dialogue">
+                    <div class="dialogue mentee-bubble">
+                        <p id="mentee-dialogue">안녕! 나는 '학습의 원리와 방법' 단원 공부 중인데, 행동주의랑 인지주의가 너무 헷갈려. 개념은 외웠는데 서로 어떻게 다른 건지 모르겠어. 좀 도와줄 수 있을까?</p>
+                    </div>
+                    <div id="scaffolding-choices" class="choice-area">
                     </div>
                     
-                    <div id="scaffolding-choices" class="scaffolding-choices">
-                        </div>
-
-                    <div id="mentor-result-message" class="mentor-result-message" style="display:none;">
-                        <p><strong>멘티 반응:</strong> <span id="mentee-reaction-text"></span></p>
-                        <p class="reward-line">배지: <span id="mentor-badge"></span>, 포인트: <span id="mentor-points">0</span></p>
+                    <div id="mentor-result-message" class="dialogue mentor-result" style="display:none;">
+                        <h4>친구의 반응</h4>
+                        <p id="mentee-reaction-text"></p>
+                        <p class="reward-info">
+                            🎉 뱃지 획득: <strong id="mentor-badge"></strong>  
+                            <span id="mentor-points"></span>점
+                        </p>
+                        <button id="complete-mentor-mission" class="action-button primary">결과 확인 및 미션 완료</button>
                     </div>
-                    
-                    <button id="complete-mentor-mission" class="action-button primary full-width" style="margin-top: 20px;">멘토링 완료</button>
                 </div>
             </div>
+
         </section>
 
         <section id="resolution-area" class="screen" style="display:none;">
-            <h2>Step 3: 학습 전략 적용 결과</h2>
             <div class="resolution-box">
-                <p id="resolution-message">여기에 미션 완료 메시지가 표시됩니다.</p>
-                <div class="feedback-detail" id="feedback-detail">
-                    </div>
+                <h2>🎉 미션 성공! 전략 결과</h2>
+                <div class="resolution-message-box">
+                    <p id="resolution-message"></p>
+                </div>
+                <div class="button-group">
+                    <button id="restart-button" class="action-button secondary">다른 전략 체험하기</button>
+                </div>
             </div>
-            
-            <button id="restart-button" class="action-button primary">다른 전략 체험하기</button>
-            <button id="restart-button-selection" class="action-button secondary">처음으로 돌아가기</button>
         </section>
 
     </main>
 
-    <div id="crossword-game-modal" class="modal" style="display:none;">
-        <div class="modal-content large">
-            <span class="close-button" id="close-crossword-modal">&times;</span>
-            <h3>교과서 핵심 개념 십자말풀이</h3>
+    <div id="crossword-game-modal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <button id="close-crossword-modal" class="close-button">X</button>
+            <h3>교과서 십자말풀이 미션</h3>
             <p id="crossword-message">단원의 핵심 개념 9가지를 모두 채워 넣으세요. (총 9문항)</p>
             <div class="crossword-game-area">
                 <div class="crossword-grid-container">
@@ -158,6 +159,7 @@
     <script src="js/behaviorism.js"></script>
     <script src="js/cognitivism.js"></script>
     <script src="js/constructivism.js"></script>
-    <script src="js/crossword.js"></script>
+    <script src="js/crossword.js"></script> 
+    
 </body>
 </html>
