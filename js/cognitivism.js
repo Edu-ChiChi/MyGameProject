@@ -119,19 +119,19 @@ function handleDrop(e) {
     }
 }
 
-// 미션 완료 체크 및 버튼 활성화 (12조각 다 채워야만 활성화)
+// 미션 완료 체크 및 버튼 활성화 (9조각 다 채워야만 활성화)
 function checkCognitivismMissionCompletion() {
     if (!completeCognitivismButton) return;
     
-    const requiredDrops = gameState.totalCognitivismPieces; // 12
+    const requiredDrops = gameState.totalCognitivismPieces; // 9
     const currentDrops = gameState.correctCognitivismDrops;
     
     if (currentDrops === requiredDrops) {
-        completeCognitivismButton.disabled = false; // 12개 채워지면 활성화
+        completeCognitivismButton.disabled = false; // 9개 채워지면 활성화
         completeCognitivismButton.textContent = "✅ 퍼즐 완성! 결과 확인하기";
         alert("🎉 모든 개념을 올바르게 연결했습니다! 이제 완료 버튼을 눌러 결과 화면으로 이동하세요."); // 완료 시 알림 추가
     } else {
-        completeCognitivismButton.disabled = true; // 12개 미만이면 비활성화
+        completeCognitivismButton.disabled = true; // 9개 미만이면 비활성화
         completeCognitivismButton.textContent = `개념 퍼즐 완료 시 활성화 (${currentDrops}/${requiredDrops})`;
     }
 };
