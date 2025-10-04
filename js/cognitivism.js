@@ -101,7 +101,7 @@ function handleDrop(e) {
 
             // 미션 완료 확인
             if (gameState.correctCognitivismDrops === gameState.totalCognitivismPieces) {
-                alert("🎉 모든 개념을 올바르게 연결했습니다! 기억의 방 탈출 성공!");
+                alert("🎉 모든 개념을 올바르게 연결했습니다! 이제 복잡한 내용을 만날 때마다 이 전략을 적용해 기억의 방을 활성화해 보세요!");
                 window.showScreen('resolution-area', 'cognitivism'); // 완료 후 해결창으로 이동
             }
         }

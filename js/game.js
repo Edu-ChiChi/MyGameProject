@@ -57,16 +57,21 @@ function updateResolutionScreen(strategy) {
 
     // 최종 확정된 해결 메시지
     if (strategy === 'behaviorism') {
-        resolutionMessage.innerHTML = `와, 정말 감사합니다! <strong>'습관의 저금통'</strong>을 체험해 보니 공부가 막막하게 느껴졌던 이유를 알 것 같아요. 작은 목표부터 보상을 받으면서 시작하는 방법을 알았으니, 이제 집중해서 공부할 수 있을 것 같아요!`;
+        resolutionMessage.innerHTML = `와, 정말 감사합니다! <strong>'습관의 저금통'</strong>을 체험을 통해 강화와 처벌의 원리를 이해했습니다!
+         이제 가장 어려운 과목에 대해 '작은 실천 목표'를 세우고 스스로 보상하며 꾸준한 학습 습관을 형성해볼게요!`;
     } else if (strategy === 'cognitivism') {
-        resolutionMessage.innerHTML = `와, 정말 감사합니다! <strong>'개념 연결하기 퍼즐'</strong>을 풀어 보니 공부할 내용이 많아서 막막했던 고민이 해결됐어요. 복잡한 내용을 묶어서 정리하는 법을 알았으니, 이제 어디서부터 시작해야 할지 알 것 같아요!`;
+        resolutionMessage.innerHTML = `와, 정말 감사합니다! <strong>'개념 연결하기 퍼즐'</strong>을 통해 정보를 조직화하고 인출하는 방법을 배울 수 있었어요~
+        앞으로 방대한 학습 내용을 만나면 저만의 '핵심 개념 퍼즐'을 만들어 장기 기억 저장소를 활성화 시켜 필요한 상황에 인출해볼게요!`;
     } else if (strategy === 'constructivism') {
+        // 구성주의 미션 결과에 따라 멘토 역할을 강조합니다.
         // data.js의 constructivismScenarios와 gameState 사용
         const result = constructivismScenarios[0].choices.find(c => c.id === gameState.constructivismChoiceId) || constructivismScenarios[0].choices[0]; 
-        resolutionMessage.innerHTML = `와, 정말 감사합니다! 제가 가진 고민이 해결되는 것 같아요. 이제 어떻게 공부해야 할지 알 것 같아요! (획득 뱃지: <strong>${result.reward.badge}</strong>)`;
+        resolutionMessage.innerHTML = `와, 감사합니다! <strong>'${result.reward.badge}'</strong>를 획득하며 최적의 비계(Scaffolding)를 어떻게 제공할 수 있는지 경험할 수 있었어요!
+        이제 스터디 그룹이나 조별 과제를 할 때, 친구의 '근접 발달 영역'을 파악해 스스로 답을 찾도록 돕는 멘토가 되어볼게요!`;
     } else if (strategy === 'crossword') {
          document.querySelector('#resolution-area h2').textContent = `🎉 단원 마무리 완료! 학습 전략 종합`;
-         resolutionMessage.innerHTML = `모든 전략을 체험하고 단원 마무리 십자말풀이까지 완료했습니다! 이제 학습에 대한 자신만의 해답을 찾았을 것입니다!`;
+         resolutionMessage.innerHTML = `핵심 개념 9가지 인출에 성공했습니다! 이제 학습에 대한 자신만의 해답을 찾았을 것입니다!<br>
+         다양한 학습 전략 중 이번 기말고사에 적용할 가장 효과적일 것 같은 전략 하나를 선택해 실천 계획을 구체적으로 세워볼까요?`;
     }
 }
 
