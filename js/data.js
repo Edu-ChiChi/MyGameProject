@@ -6,7 +6,7 @@ let gameState = {
     tokens: 0, 
     correctCognitivismDrops: 0, 
     isBuffed: false, 
-    totalCognitivismPieces: 12, // 총 조각 개수 유지
+    totalCognitivismPieces: 9, // 총 조각 개수 유지
     isCrosswordCompleted: false, // 십자말풀이 완료 상태 추적
     isCrosswordModalOpen: false, // 십자말풀이 모달 열림 상태 추적 
     crosswordGridState: [], // 십자말풀이 격자 상태 저장
