@@ -636,3 +636,118 @@ h2 {
     margin-top: 10px;
     font-size: 0.9em;
 }
+
+/* --------------------------------------
+ * 8. 모바일 반응형 조정 (Media Queries)
+ * -------------------------------------- */
+
+/* 태블릿 및 모바일 (768px 이하) */
+@media (max-width: 768px) {
+    body {
+        padding: 10px;
+    }
+    .game-container {
+        padding: 15px;
+    }
+    
+    /* 4. 전문가 선택 영역 */
+    .expert-list {
+        flex-direction: column; /* 세로로 쌓기 */
+        gap: 10px;
+    }
+    .expert {
+        width: 100%; /* 가로 전체 사용 */
+        min-width: unset;
+        padding: 10px;
+    }
+    /* 전문가 말풍선 숨김 (공간 확보) */
+    .expert-bubble {
+        display: none; 
+        opacity: 0 !important;
+    }
+    
+    /* 5-1. 행동주의 */
+    .card-list {
+        flex-direction: column;
+        gap: 10px;
+    }
+    .task-card {
+        width: 100%;
+        min-width: unset;
+    }
+
+    /* 5-2. 인지주의 */
+    .drop-zones-container {
+        flex-direction: column; /* 세로로 쌓기 */
+    }
+    .drop-zone {
+        min-height: 100px; /* 높이 줄이기 */
+    }
+
+    /* 7. 십자말풀이 모달 */
+    .crossword-game-area {
+        flex-direction: column; /* 세로로 쌓기 */
+    }
+    
+    .crossword-grid-container {
+        /* 그리드 깨짐 방지를 위해 최소 너비 설정 (가로 스크롤 허용) */
+        min-width: 300px; 
+        max-width: 100%;
+        width: 100%;
+    }
+    
+    .crossword-clues-area {
+        border-left: none; 
+        padding-left: 0;
+        padding-top: 15px;
+        border-top: 1px solid #eee;
+    }
+    
+    /* 십자말풀이 입력 */
+    #input-container {
+        flex-direction: column; /* 입력창과 버튼을 세로로 쌓기 */
+        margin-top: 10px;
+    }
+    #crossword-answer-input {
+        width: 100%;
+        border-radius: 5px; 
+        margin: 5px 0 0 0;
+    }
+    #check-answer-button {
+        width: 100%;
+        border-radius: 5px; 
+        margin: 5px 0 0 0;
+    }
+    
+    /* 공통 버튼 그룹 */
+    .button-group {
+        flex-direction: column;
+        gap: 5px;
+    }
+    .action-button {
+        width: 100%;
+        margin: 0;
+    }
+    
+    .modal-content {
+        width: 95%;
+    }
+}
+
+/* 추가 모바일 최적화 (600px 이하) */
+@media (max-width: 600px) {
+    h1 {
+        font-size: 1.6em;
+    }
+    h2 {
+        font-size: 1.3em;
+    }
+    
+    .puzzle-cell {
+        /* 셀 크기가 너무 작아지는 것을 방지하기 위해 1:1 비율을 유지하면서 크기 조정 */
+        padding-bottom: 15%; 
+    }
+    .cell-number {
+        font-size: 0.5em;
+    }
+}
