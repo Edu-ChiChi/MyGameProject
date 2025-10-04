@@ -6,6 +6,7 @@
 
 const puzzlePiecesContainer = document.getElementById('puzzle-pieces-container');
 const dropZones = document.querySelectorAll('.drop-zone');
+const completeCognitivismButton = document.getElementById('simulate-cognitivism-completion');
 
 // 미션 시작 시 호출 (game.js에서 호출됨)
 window.loadCognitivismMission = function() {
@@ -41,6 +42,9 @@ window.loadCognitivismMission = function() {
         
         puzzlePiecesContainer.appendChild(div);
     });
+
+    // 초기 로드 시 버튼 상채 확인/설정
+    checkCognitivismMissionCompletion(); 
 }
 
 // Drag Start
@@ -99,10 +103,13 @@ function handleDrop(e) {
                  targetZone.classList.add('all-correct');
             }
 
-            // 미션 완료 확인
+            // 미션 완료 확인 (12개 모두 성공 시에만 화면 전환 가능)
             if (gameState.correctCognitivismDrops === gameState.totalCognitivismPieces) {
-                alert("🎉 모든 개념을 올바르게 연결했습니다! 이제 복잡한 내용을 만날 때마다 이 전략을 적용해 기억의 방을 활성화해 보세요!");
-                window.showScreen('resolution-area', 'cognitivism'); // 완료 후 해결창으로 이동
+                // 기존 arert 와 window.showScreen 호출 주석처리
+                // alert("🎉 모든 개념을 올바르게 연결했습니다! 이제 복잡한 내용을 만날 때마다 이 전략을 적용해 기억의 방을 활성화해 보세요!");
+                // window.showScreen('resolution-area', 'cognitivism'); // 완료 후 해결창으로 이동
+                
+                checkCognitivismMissionCompletion();
             }
         }
     } else {
@@ -112,19 +119,45 @@ function handleDrop(e) {
     }
 }
 
+// 미션 완료 체크 및 버튼 활성화 (12조각 다 채워야만 활성화)
+function checkCognitivismMissionCompletion() {
+    if (!completeCognitivismButton) return;
+    
+    const requiredDrops = gameState.totalCognitivismPieces; // 12
+    const currentDrops = gameState.correctCognitivismDrops;
+    
+    if (currentDrops === requiredDrops) {
+        completeCognitivismButton.disabled = false; // 12개 채워지면 활성화
+        completeCognitivismButton.textContent = "✅ 퍼즐 완성! 결과 확인하기";
+        alert("🎉 모든 개념을 올바르게 연결했습니다! 이제 완료 버튼을 눌러 결과 화면으로 이동하세요."); // 완료 시 알림 추가
+    } else {
+        completeCognitivismButton.disabled = true; // 12개 미만이면 비활성화
+        completeCognitivismButton.textContent = `개념 퍼즐 완료 시 활성화 (${currentDrops}/${requiredDrops})`;
+    }
+};
 
-// 시뮬레이션 버튼 이벤트
+// '미션 시뮬레이션 완료' 버튼 이벤트 연결
 document.addEventListener('DOMContentLoaded', () => {
     const completeButton = document.getElementById('simulate-cognitivism-completion');
     
     if (completeButton) {
+        // 기존 리스너가 중복되지 않도록 재정의합니다.
+        // 버튼을 클릭했을 때, 완료 상태일 경우에만 화면이 전환되도록 보장합니다.
         completeButton.addEventListener('click', () => {
-            if (window.showScreen) {
-                alert("12개의 개념 조각을 모두 올바르게 매칭하여 기억의 방을 탈출했습니다! (시뮬레이션)");
-                // 상태 초기화 및 화면 전환
-                gameState.correctCognitivismDrops = 0;
+            if (window.showScreen && gameState.correctCognitivismDrops === gameState.totalCognitivismPieces) { 
+                // 최종 확인 후 화면 전환 (버튼이 활성화된 상태여야 함)
                 window.showScreen('resolution-area', 'cognitivism');
+            } else {
+                // 버튼이 비활성화되어 있기 때문에 이 경고는 뜨지 않지만 안전 장치입니다.
+                alert("개념 퍼즐을 먼저 모두 완성해야 미션을 완료할 수 있습니다.");
             }
         });
+        
+        // 초기 로드 시 버튼 비활성화 상태로 시작
+        completeButton.disabled = true;
+        // 버튼 텍스트 초기 설정 (checkCognitivismMissionCompletion 함수가 로드 시 업데이트하지만 안전 장치)
+        if (completeButton.textContent.startsWith('시뮬레이션 완료')) {
+             completeButton.textContent = `개념 퍼즐 완료 시 활성화 (0/${gameState.totalCognitivismPieces})`;
+        }
     }
 });
