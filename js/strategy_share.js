@@ -264,10 +264,20 @@ window.goToWriteStrategy = function() {
         if (type === 'cognitivism') titlePlaceholder = '인지주의 기반 학습 전략: 개념 연결법';
         if (type === 'constructivism') titlePlaceholder = '구성주의 기반 학습 전략: 협력 비계 활용법';
         
-        document.getElementById('strategy-title-input').value = titlePlaceholder;
-        document.getElementById('strategy-content-input').value = '';
+        // 🛑 수정: index.html에 존재하는 ID로 변경 (student-name과 strategy-text를 초기화)
+        // document.getElementById('strategy-title-input').value = titlePlaceholder; // 삭제 또는 수정
+        document.getElementById('student-name').value = '익명'; // 이름/닉네임 기본값 설정
+        document.getElementById('strategy-text').value = ''; // 내용 초기화
+        
         writeFeedback.textContent = '💡 나만의 학습 전략을 작성하고 공유해 보세요!';
         writeFeedback.style.color = 'var(--color-dark)';
+
+        // 🛑 추가: strategy-select의 값도 현재 전략으로 업데이트
+        const strategySelect = document.getElementById('strategy-select');
+        if (strategySelect) {
+            // strategyMap을 사용하여 한글 이름으로 업데이트
+            strategySelect.value = strategyMap[gameState.currentStrategy] || '행동주의'; 
+        }
     }
 };
 
