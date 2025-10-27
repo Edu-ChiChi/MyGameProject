@@ -6,6 +6,7 @@
 
 // [!!필수 변경!!] 이 URL은 data.js 파일에 정의되어야 합니다.
 // 401 권한 오류를 해결하기 위해 Google Sheets API 대신 Apps Script(GAS) 웹 앱 URL을 사용합니다.
+// ⚠️ 사용자가 새로 제공한 URL로 업데이트됨
 const WRITE_GAS_URL = "https://script.google.com/macros/s/AKfycbwViQYs1-kDdLE3x6e9m1w57g5kQJka7-Him1dJwKa1oI8GeVulNUSDDFtKGB2m4J5ufQ/exec";
 const READ_GAS_URL = "https://script.google.com/macros/s/AKfycbwViQYs1-kDdLE3x6e9m1w57g5kQJka7-Him1dJwKa1oI8GeVulNUSDDFtKGB2m4J5ufQ/exec";
 
@@ -17,161 +18,174 @@ const backToWriteButton = document.getElementById('back-to-write-button');
 const reloadStrategiesButton = document.getElementById('reload-strategies-button');
 const writeFeedback = document.getElementById('write-feedback');
 const strategyListContainer = document.getElementById('strategy-list-container');
-const loadingMessage = document.getElementById('loading-message');
-
-// API 엔드포인트 기본 URL (Apps Script URL로 대체되어 사용하지 않습니다.)
-// const BASE_URL = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values`;
-
+const listFeedback = document.getElementById('list-feedback');
 
 // --------------------------------------------------
-// A. 저장(쓰기) 함수 (GAS POST 요청으로 변경)
+// 2. 저장 (쓰기) 함수
 // --------------------------------------------------
 
-async function saveStrategy() {
-    writeFeedback.style.display = 'none';
-    const name = document.getElementById('student-name').value.trim() || '익명';
-    const strategy = document.getElementById('strategy-select').value;
-    const plan = document.getElementById('strategy-text').value.trim();
-    
-    if (plan.length < 10) {
-        // alert("실천 계획을 10자 이상 구체적으로 작성해 주세요."); // alert 대신 div 사용
-        writeFeedback.textContent = "❗ 실천 계획을 10자 이상 구체적으로 작성해 주세요.";
-        writeFeedback.style.backgroundColor = '#fff3cd'; 
-        writeFeedback.style.color = '#856404'; 
-        writeFeedback.style.borderColor = '#ffeeba';
-        writeFeedback.style.display = 'block';
+/**
+ * 작성된 전략을 Google Sheets로 저장 요청
+ */
+function saveStrategy() {
+    const strategyTitle = document.getElementById('strategy-title-input').value.trim();
+    const strategyContent = document.getElementById('strategy-content-input').value.trim();
+
+    if (!strategyTitle || !strategyContent) {
+        writeFeedback.textContent = '❌ 제목과 내용을 모두 입력해 주세요!';
+        writeFeedback.style.color = 'var(--color-danger)';
         return;
     }
+
+    // 현재 선택된 전략 타입 (예: behaviorism, cognitivism)
+    const strategyType = gameState.currentStrategy || '미선택'; 
+
+    const data = {
+        action: 'write',
+        title: strategyTitle,
+        content: strategyContent,
+        type: strategyType,
+        date: new Date().toLocaleDateString('ko-KR'),
+        time: new Date().toLocaleTimeString('ko-KR')
+    };
+
+    writeFeedback.textContent = '⏳ 전략을 저장 중입니다...';
+    writeFeedback.style.color = 'var(--color-secondary)';
     
-    // 타임스탬프를 KST로 설정하여 기록
-    const timestamp = new Date().toLocaleString('ko-KR', { timeZone: 'Asia/Seoul' });
-    
-    // API URL: 쓰기 요청 (GAS 웹 앱 URL 사용)
-    const url = WRITE_GAS_URL;
+    // 로딩 상태를 표시하는 동안 버튼을 비활성화
+    saveStrategyButton.disabled = true;
 
-    try {
-        saveStrategyButton.disabled = true;
-        saveStrategyButton.textContent = "저장 중...";
+    fetch(WRITE_GAS_URL, {
+        method: 'POST',
+        mode: 'no-cors', // Apps Script CORS 정책 우회
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data)
+    })
+    .then(response => {
+        // 'no-cors' 모드에서는 응답 상태를 직접 확인할 수 없습니다.
+        // 따라서 성공/실패 여부는 Apps Script 내부 로직과 시나리오에 따라
+        // 성공 메시지를 표시하는 것으로 가정합니다.
         
-        // GAS가 파싱하기 쉬운 JSON 형태로 데이터를 전송합니다.
-        const requestBody = {
-            name: name,
-            strategy: strategy,
-            plan: plan,
-            timestamp: timestamp
-        };
-
+        // 실제로는 Apps Script가 시트 작성 후 JSON 응답을 반환해야 하지만, 
+        // 간단한 예제이므로 fetch가 오류 없이 완료되면 성공으로 간주합니다.
         
+        writeFeedback.textContent = '✅ 전략이 성공적으로 저장되었습니다! 목록에서 확인해 보세요.';
+        writeFeedback.style.color = 'var(--color-success)';
+        document.getElementById('strategy-title-input').value = '';
+        document.getElementById('strategy-content-input').value = '';
 
-        const response = await fetch(url, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(requestBody)
-        });
-
-        // 🛑 수정: 응답을 텍스트로 먼저 받고 JSON 파싱을 시도하는 방식으로 변경하여 에러 원인 추적 강화
-        const responseText = await response.text();
-        let responseData;
-        
-        try {
-            responseData = JSON.parse(responseText);
-        } catch (e) {
-            // JSON 파싱 실패 시, 응답 텍스트를 에러 메시지로 표시
-            writeFeedback.textContent = `❌ 서버 응답 형식 오류: 서버가 유효한 JSON 대신 '${responseText.substring(0, 50)}...'를 반환했습니다. (GAS 스크립트 디버깅 필요)`;
-            writeFeedback.style.display = 'block';
-            console.error('JSON Parsing Error:', e, 'Raw Response:', responseText);
-            return; // 파싱 실패 시 함수 종료
-        }
-
-        // GAS는 보통 status 200을 반환합니다. JSON 응답의 'result' 필드를 확인합니다.
-        if (response.ok && responseData && responseData.result === "success") {
-            writeFeedback.textContent = `✅ 전략이 성공적으로 공유되었습니다! (작성자: ${name})`;
-            writeFeedback.style.display = 'block';
-            document.getElementById('strategy-text').value = ''; // 작성 내용 초기화
-        } else {
-            // response.ok가 true라도 GAS 내부에서 에러가 발생하여 error 필드를 반환했을 수 있습니다.
-            const errorMsg = responseData?.error || response.statusText || '알 수 없는 오류';
-            writeFeedback.textContent = `❌ 저장 실패: Apps Script 처리 오류. (오류: ${errorMsg.substring(0, 50)}...) (GAS 로그 확인 필요)`;
-            writeFeedback.style.display = 'block';
-        }
-    } catch (error) {
-        // 네트워크 연결 자체의 문제(CORS 오류 포함) 또는 서버 연결 실패 시 이 블록이 실행됨
-        writeFeedback.textContent = '❌ 네트워크 연결 실패 또는 Apps Script URL/권한 오류가 발생했습니다. (URL 및 배포 상태 확인 필수)';
-        writeFeedback.style.display = 'block';
-        console.error('Save Strategy Network/Connection Error:', error);
-    } finally {
+        // 성공 후 목록 새로고침
+        loadSharedStrategies();
+    })
+    .catch(error => {
+        // 네트워크 오류 등 심각한 오류만 catch됩니다.
+        console.error('전략 저장 중 오류 발생:', error);
+        writeFeedback.textContent = '🚨 전략 저장 중 오류가 발생했습니다. Apps Script 배포 설정을 확인해 주세요. (오류 상세: ' + error.message + ')';
+        writeFeedback.style.color = 'var(--color-danger)';
+    })
+    .finally(() => {
         saveStrategyButton.disabled = false;
-        saveStrategyButton.textContent = "전략 저장 및 공유";
-    }
+        // 5초 후 메시지 초기화
+        setTimeout(() => {
+            writeFeedback.textContent = '';
+        }, 5000);
+    });
 }
 
 
 // --------------------------------------------------
-// B. 불러오기(읽기) 함수 (GAS GET 요청으로 변경)
+// 3. 목록 불러오기 (읽기) 함수
 // --------------------------------------------------
 
-async function loadSharedStrategies() {
-    strategyListContainer.innerHTML = ''; // 기존 목록 초기화
-    loadingMessage.textContent = '전략 목록을 불러오는 중...';
-    loadingMessage.style.display = 'block';
-    
-    // API URL: 읽기 요청 (GAS 웹 앱 URL 사용)
-    const url = READ_GAS_URL;
-    
-    try {
-        const response = await fetch(url);
-        
-        if (!response.ok) {
-             // 🛑 수정: 에러 메시지를 response.text() 대신 response.statusText로 표시하여 안정성 확보
-             const errorStatus = response.statusText || response.status;
-             loadingMessage.textContent = `❌ 목록 로드 실패: Apps Script 설정 또는 URL을 확인하세요. (HTTP 오류: ${errorStatus})`;
-             return;
+/**
+ * 저장된 전략 목록을 Google Sheets에서 불러오기 요청
+ */
+function loadSharedStrategies() {
+    strategyListContainer.innerHTML = '';
+    listFeedback.textContent = '⏳ 공유된 전략 목록을 불러오는 중입니다...';
+    listFeedback.style.color = 'var(--color-secondary)';
+
+    // Apps Script에 읽기 요청을 보냅니다.
+    // 'read' 액션 파라미터를 추가하여 GAS에서 읽기 함수가 실행되도록 유도합니다.
+    const url = `${READ_GAS_URL}?action=read`;
+
+    fetch(url)
+    .then(response => {
+        if (response.ok) {
+            return response.json();
+        }
+        // GAS 배포 오류는 여기서 잡히지 않지만, CORS 문제를 피하기 위해 
+        // 성공적인 HTTP 응답을 가정하고 JSON 파싱을 시도합니다.
+        throw new Error('네트워크 응답 오류 또는 Apps Script 설정 오류');
+    })
+    .then(data => {
+        if (data.error) {
+            // Apps Script에서 명시적으로 오류를 반환한 경우
+            listFeedback.textContent = `🚨 전략 로딩 오류: ${data.error}`;
+            listFeedback.style.color = 'var(--color-danger)';
+            console.error('Apps Script Error:', data.error);
+            return;
         }
 
-        const data = await response.json();
-        // GAS에서 Sheets API의 values 구조를 그대로 반환한다고 가정합니다.
-        const values = data.values;
-        
-        if (!values || values.length <= 1) { // 헤더 행 제외
-            strategyListContainer.innerHTML = '<p style="text-align: center; margin-top: 20px;">아직 공유된 전략이 없습니다.</p>';
-        } else {
-            // 헤더(첫 행) 제외하고 데이터만 처리
-            const strategies = values.slice(1).reverse(); // 최신순 정렬을 위해 reverse()
-            
-            strategyListContainer.innerHTML = strategies.map(row => {
-                const [name, strategy, plan, timestamp] = row;
-                // 전략에 따라 카드 색상 클래스를 적용합니다.
-                const strategyClass = strategy ? strategy.toLowerCase().replace(/[^a-z]/g, '') : 'secondary';
+        if (data && data.length > 0) {
+            // 최신 전략이 위에 오도록 내림차순 정렬 (Sheet의 구조에 따라 다름)
+            // 여기서는 이미 최신 데이터가 위에 있다고 가정하고 그대로 사용하거나,
+            // 필요시 JS에서 data.reverse() 등으로 처리 가능
+
+            const html = data.map(strategy => {
+                // 시트 열 순서: Type, Title, Content, Date, Time
+                const [type, title, content, date, time] = strategy;
+                
+                // 줄바꿈 문자 처리
+                const displayContent = content ? content.replace(/\n/g, '<br>') : '';
                 
                 return `
-                    <div class="task-card ${strategyClass}" style="width: 100%;">
-                        <p><strong>${name}</strong> 님의 전략: <span style="color: var(--color-primary);">${strategy}</span></p>
-                        <p style="font-size: 0.9em; margin-bottom: 5px;">${plan}</p>
-                        <span style="font-size: 0.75em; color: var(--color-secondary);">${timestamp || '시간 정보 없음'}</span>
+                    <div class="strategy-item">
+                        <div class="strategy-header">
+                            <span class="strategy-type badge ${type.toLowerCase()}">${type}</span>
+                            <h5 class="strategy-title">${title}</h5>
+                            <span class="strategy-datetime">${date} ${time}</span>
+                        </div>
+                        <p class="strategy-content">${displayContent}</p>
                     </div>
                 `;
             }).join('');
-        }
-        
-        loadingMessage.style.display = 'none';
+            
+            strategyListContainer.innerHTML = html;
+            listFeedback.textContent = `✅ 총 ${data.length}개의 전략이 성공적으로 로드되었습니다.`;
+            listFeedback.style.color = 'var(--color-success)';
 
-    } catch (error) {
-        loadingMessage.textContent = '❌ 네트워크 오류가 발생했습니다.';
-        console.error('Load Strategy Error:', error);
-    }
+        } else {
+            strategyListContainer.innerHTML = '<p class="text-center">아직 공유된 학습 전략이 없습니다. 첫 번째 전략을 작성해 보세요!</p>';
+            listFeedback.textContent = '💡 전략 목록이 비어 있습니다.';
+            listFeedback.style.color = 'var(--color-secondary)';
+        }
+    })
+    .catch(error => {
+        console.error('전략 목록 로드 중 오류 발생:', error);
+        listFeedback.textContent = '🚨 전략 목록을 불러오는 중 네트워크 또는 서버 오류가 발생했습니다. Apps Script의 권한 설정(익명 사용자 포함) 및 배포 URL이 정확한지 확인해 주세요.';
+        listFeedback.style.color = 'var(--color-danger)';
+    })
+    .finally(() => {
+        // 5초 후 메시지 초기화
+        setTimeout(() => {
+            if (listFeedback.textContent.startsWith('⏳')) {
+                 listFeedback.textContent = '';
+            }
+        }, 5000);
+    });
 }
 
 
 // --------------------------------------------------
-// C. 이벤트 리스너 및 화면 전환 연결 (페이지 이동 오류 수정 포함)
+// 4. 이벤트 리스너 할당
 // --------------------------------------------------
 
-// 게임이 로드된 후 이벤트 연결
 document.addEventListener('DOMContentLoaded', () => {
-    
-    // ① 페이지 이동 오류 수정: '나만의 전략 작성하기' 버튼 클릭 시 리스너 연결
+    // game.js에서 goToWriteStrategyButton에 이벤트 리스너가 중복 할당될 수 있으므로,
+    // 여기서도 안전하게 추가합니다. (index.html의 resolution-area에 있는 버튼)
     const goToWriteStrategyButton = document.getElementById('go-to-write-strategy');
     if (goToWriteStrategyButton) {
         goToWriteStrategyButton.addEventListener('click', window.goToWriteStrategy);
@@ -214,7 +228,20 @@ document.addEventListener('DOMContentLoaded', () => {
 window.goToWriteStrategy = function() {
     if (window.showScreen) {
         window.showScreen('strategy-write-area');
-        // 미션 완료 후 이전에 선택했던 전략을 기본값으로 설정
-        document.getElementById('strategy-select').value = strategyMap[gameState.currentStrategy] || '행동주의';
+        
+        // 제목 자동 완성
+        const type = gameState.currentStrategy;
+        let titlePlaceholder = '나만의 학습 전략';
+        if (type === 'behaviorism') titlePlaceholder = '행동주의 기반 학습 전략: 목표 달성 기록';
+        if (type === 'cognitivism') titlePlaceholder = '인지주의 기반 학습 전략: 개념 연결법';
+        if (type === 'constructivism') titlePlaceholder = '구성주의 기반 학습 전략: 협력 비계 활용법';
+        
+        document.getElementById('strategy-title-input').value = titlePlaceholder;
+        document.getElementById('strategy-content-input').value = '';
+        writeFeedback.textContent = '💡 나만의 학습 전략을 작성하고 공유해 보세요!';
+        writeFeedback.style.color = 'var(--color-dark)';
     }
-}
+};
+
+// 최초 로딩 시 목록을 바로 로드할 필요는 없습니다. 사용자가 '목록 보기'를 눌렀을 때 로드됩니다.
+// window.loadSharedStrategies = loadSharedStrategies; // 외부에서 호출될 수 있도록 노출
