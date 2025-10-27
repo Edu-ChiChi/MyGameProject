@@ -6,8 +6,8 @@
 
 // [!!필수 변경!!] 이 URL은 data.js 파일에 정의되어야 합니다.
 // 401 권한 오류를 해결하기 위해 Google Sheets API 대신 Apps Script(GAS) 웹 앱 URL을 사용합니다.
-const WRITE_GAS_URL = "https://script.google.com/macros/s/AKfycbwqmY4IbZaK90NYfGSw9Dy0DmSG7nBFFD1UtNWvlgWqJQzVHmLh76S0JnXGYC3TCiRqSg/exec";
-const READ_GAS_URL = "https://script.google.com/macros/s/AKfycbwqmY4IbZaK90NYfGSw9Dy0DmSG7nBFFD1UtNWvlgWqJQzVHmLh76S0JnXGYC3TCiRqSg/exec";
+const WRITE_GAS_URL = "https://script.google.com/macros/s/AKfycbxJBAea374I2eOH9PL39Z0gKMzUSOobzPRUotAU2bzblbcXd-7TNIU1q16bXYIvWguHEg/exec";
+const READ_GAS_URL = "https://script.google.com/macros/s/AKfycbxJBAea374I2eOH9PL39Z0gKMzUSOobzPRUotAU2bzblbcXd-7TNIU1q16bXYIvWguHEg/exec";
 
 // DOM 요소
 const saveStrategyButton = document.getElementById('save-strategy-button');
@@ -56,6 +56,8 @@ async function saveStrategy() {
             timestamp: timestamp
         };
 
+        
+
         const response = await fetch(url, {
             method: 'POST',
             headers: {
@@ -64,18 +66,23 @@ async function saveStrategy() {
             body: JSON.stringify(requestBody)
         });
 
-        // GAS는 보통 status 200을 반환합니다.
-        if (response.ok) {
+        // 🛑 수정: 이제 GAS가 JSON을 반환할 것으로 예상하고 파싱을 시도합니다.
+        const responseData = await response.json(); 
+
+        // GAS는 보통 status 200을 반환합니다. JSON 응답의 'result' 필드를 확인합니다.
+        if (response.ok && responseData && responseData.result === "success") {
             writeFeedback.textContent = `✅ 전략이 성공적으로 공유되었습니다! (작성자: ${name})`;
             writeFeedback.style.display = 'block';
             document.getElementById('strategy-text').value = ''; // 작성 내용 초기화
         } else {
-            const errorText = await response.text();
-            writeFeedback.textContent = `❌ 저장 실패: Apps Script 설정 또는 URL을 확인하세요. (에러: ${errorText.substring(0, 50)}...)`;
+            // response.ok가 true라도 GAS 내부에서 에러가 발생하여 error 필드를 반환했을 수 있습니다.
+            const errorMsg = responseData?.error || response.statusText;
+            writeFeedback.textContent = `❌ 저장 실패: Apps Script 처리 오류 또는 네트워크 문제. (오류: ${errorMsg.substring(0, 50)}...)`;
             writeFeedback.style.display = 'block';
         }
     } catch (error) {
-        writeFeedback.textContent = '❌ 네트워크 또는 Apps Script 호출 오류가 발생했습니다.';
+        // 네트워크 연결 자체의 문제 또는 JSON 파싱 실패 등
+        writeFeedback.textContent = '❌ 네트워크 연결 또는 서버 응답 처리 오류가 발생했습니다.';
         writeFeedback.style.display = 'block';
         console.error('Save Strategy Error:', error);
     } finally {
@@ -101,8 +108,9 @@ async function loadSharedStrategies() {
         const response = await fetch(url);
         
         if (!response.ok) {
-             const errorText = await response.text();
-             loadingMessage.textContent = `❌ 목록 로드 실패: Apps Script 설정 또는 URL을 확인하세요. (에러: ${errorText.substring(0, 50)}...)`;
+             // 🛑 수정: 에러 메시지를 response.text() 대신 response.statusText로 표시하여 안정성 확보
+             const errorStatus = response.statusText || response.status;
+             loadingMessage.textContent = `❌ 목록 로드 실패: Apps Script 설정 또는 URL을 확인하세요. (HTTP 오류: ${errorStatus})`;
              return;
         }
 

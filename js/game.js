@@ -143,6 +143,21 @@ function initializeGame() {
             alert("아쉽게도 교환소 구매 기능은 아직 구현되지 않았습니다. 다음 업데이트를 기대해 주세요! 😢");
         });
     }
+// --------------------------------------------------
+// ⭐ [추가된 코드] 학습 전략 작성 화면 연결
+// --------------------------------------------------
+    // 전략 작성 화면 이동 버튼 이벤트 (해결 완료 화면)
+    // index.html의 resolution-area에 추가한 '나만의 전략 작성하기' 버튼 연결
+    const goToWriteStrategyButton = document.getElementById('go-to-write-strategy');
+    if (goToWriteStrategyButton) {
+        goToWriteStrategyButton.addEventListener('click', () => {
+            // strategy_share.js에 정의된 goToWriteStrategy 함수를 호출
+            if (window.goToWriteStrategy) {
+                window.goToWriteStrategy(); 
+            }
+        });
+    }
+
 }
 
 // 페이지 로드 시 초기화
