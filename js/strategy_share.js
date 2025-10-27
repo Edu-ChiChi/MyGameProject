@@ -57,20 +57,33 @@ function saveStrategy() {
 
     fetch(WRITE_GAS_URL, {
         method: 'POST',
-        mode: 'no-cors', // Apps Script CORS 정책 우회
+        // 🛑 수정: mode: 'no-cors'를 제거하여 응답 상태를 확인하고 JSON을 파싱할 수 있도록 합니다.
         headers: {
             'Content-Type': 'application/json',
         },
         body: JSON.stringify(data)
     })
     .then(response => {
-        // 'no-cors' 모드에서는 응답 상태를 직접 확인할 수 없습니다.
-        // 따라서 성공/실패 여부는 Apps Script 내부 로직과 시나리오에 따라
-        // 성공 메시지를 표시하는 것으로 가정합니다.
+        // 응답 상태가 200-299가 아니면 직접 에러 발생 (권한/URL 오류 확인)
+        if (!response.ok) {
+             const errorStatus = response.statusText || `HTTP Error ${response.status}`;
+             throw new Error(`GAS 서버 응답 오류: ${errorStatus}. 권한 또는 URL 확인 필요.`);
+        }
         
-        // 실제로는 Apps Script가 시트 작성 후 JSON 응답을 반환해야 하지만, 
-        // 간단한 예제이므로 fetch가 오류 없이 완료되면 성공으로 간주합니다.
-        
+        // 정상 응답이라면 JSON 파싱을 시도
+        return response.json().then(data => {
+            if (data.error) {
+                // GAS 스크립트 내부에서 에러 처리 후 JSON으로 반환한 경우
+                 throw new Error(`GAS 스크립트 오류: ${data.error}`);
+            }
+            return data;
+        }).catch(e => {
+             // JSON 파싱 자체에 실패한 경우 (GAS가 JSON이 아닌 HTML 등을 반환)
+             throw new Error(`GAS 응답 파싱 오류. 서버 응답이 유효한 JSON 형식이 아닙니다.`);
+        });
+    })
+    .then(data => {
+        // 성공 처리
         writeFeedback.textContent = '✅ 전략이 성공적으로 저장되었습니다! 목록에서 확인해 보세요.';
         writeFeedback.style.color = 'var(--color-success)';
         document.getElementById('strategy-title-input').value = '';
@@ -80,16 +93,21 @@ function saveStrategy() {
         loadSharedStrategies();
     })
     .catch(error => {
-        // 네트워크 오류 등 심각한 오류만 catch됩니다.
+        // 네트워크 오류 또는 커스텀 throw된 오류가 여기서 잡힙니다.
         console.error('전략 저장 중 오류 발생:', error);
-        writeFeedback.textContent = '🚨 전략 저장 중 오류가 발생했습니다. Apps Script 배포 설정을 확인해 주세요. (오류 상세: ' + error.message + ')';
+        // 에러 메시지를 사용자에게 더 명확하게 전달
+        writeFeedback.textContent = `🚨 전략 저장 실패: ${error.message}`;
         writeFeedback.style.color = 'var(--color-danger)';
     })
     .finally(() => {
         saveStrategyButton.disabled = false;
         // 5초 후 메시지 초기화
         setTimeout(() => {
-            writeFeedback.textContent = '';
+            if (writeFeedback.textContent.startsWith('🚨') || writeFeedback.textContent.startsWith('✅')) {
+                // 성공 또는 실패 메시지는 유지
+            } else {
+                writeFeedback.textContent = '';
+            }
         }, 5000);
     });
 }
@@ -113,12 +131,13 @@ function loadSharedStrategies() {
 
     fetch(url)
     .then(response => {
-        if (response.ok) {
-            return response.json();
+        // 응답 상태 확인
+        if (!response.ok) {
+            const errorStatus = response.statusText || `HTTP Error ${response.status}`;
+            throw new Error(`GAS 서버 응답 오류: ${errorStatus}. 권한 또는 URL 확인 필요.`);
         }
-        // GAS 배포 오류는 여기서 잡히지 않지만, CORS 문제를 피하기 위해 
-        // 성공적인 HTTP 응답을 가정하고 JSON 파싱을 시도합니다.
-        throw new Error('네트워크 응답 오류 또는 Apps Script 설정 오류');
+        // GAS는 JSON을 반환해야 합니다.
+        return response.json();
     })
     .then(data => {
         if (data.error) {
@@ -130,12 +149,9 @@ function loadSharedStrategies() {
         }
 
         if (data && data.length > 0) {
-            // 최신 전략이 위에 오도록 내림차순 정렬 (Sheet의 구조에 따라 다름)
-            // 여기서는 이미 최신 데이터가 위에 있다고 가정하고 그대로 사용하거나,
-            // 필요시 JS에서 data.reverse() 등으로 처리 가능
-
+            // 시트 데이터 처리
             const html = data.map(strategy => {
-                // 시트 열 순서: Type, Title, Content, Date, Time
+                // 시트 열 순서: Type, Title, Content, Date, Time (GAS에서 전달하는 배열 순서)
                 const [type, title, content, date, time] = strategy;
                 
                 // 줄바꿈 문자 처리
@@ -165,7 +181,7 @@ function loadSharedStrategies() {
     })
     .catch(error => {
         console.error('전략 목록 로드 중 오류 발생:', error);
-        listFeedback.textContent = '🚨 전략 목록을 불러오는 중 네트워크 또는 서버 오류가 발생했습니다. Apps Script의 권한 설정(익명 사용자 포함) 및 배포 URL이 정확한지 확인해 주세요.';
+        listFeedback.textContent = `🚨 전략 목록 로드 실패: ${error.message}`;
         listFeedback.style.color = 'var(--color-danger)';
     })
     .finally(() => {
@@ -218,7 +234,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // 뒤로 가기 버튼 연결 (목록 -> 작성)
     if (backToWriteButton && window.showScreen) {
-        backToWriteButton.addEventListener('click', () => {
+        backToToWriteButton.addEventListener('click', () => {
             window.showScreen('strategy-write-area');
         });
     }
