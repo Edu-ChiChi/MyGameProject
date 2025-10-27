@@ -137,6 +137,13 @@ async function loadSharedStrategies() {
 
 // 게임이 로드된 후 이벤트 연결
 document.addEventListener('DOMContentLoaded', () => {
+    // document.addEventListener('DOMContentLoaded', () => { ... }); 블록 내부에 추가
+
+    // '나만의 전략 작성하기' 버튼 클릭 시
+    const goToWriteStrategyButton = document.getElementById('go-to-write-strategy');
+    if (goToWriteStrategyButton) {
+        goToWriteStrategyButton.addEventListener('click', window.goToWriteStrategy);
+    }
     
     // 저장 버튼 클릭 시
     if (saveStrategyButton) {
