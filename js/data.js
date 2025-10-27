@@ -110,10 +110,8 @@ const strategyMap = {
 };
 
 // --------------------------------------------------
-// 🚀 6. Google Sheets API 연동을 위한 상수
-// --------------------------------------------------
-const SHEET_API_KEY = "AIzaSyC9KDZwUzc9F2-YdXE1LLa36F1q8nqyGoA"; 
-const SHEET_ID = "1svZLw2Rp9lq54JlfGT77ehpZLzXw-ulIn7TM4Mo6Dpc";     
-const SHEET_NAME = "학습전략";          
-// A열: 이름, B열: 선택 전략, C열: 실천 계획, D열: 타임스탬프 (자동 추가)
-const SHEET_RANGE = `${SHEET_NAME}!A:D`;
+// js/data.js 파일에서 다음 두 줄을 주석 처리하고 GAS URL로 대체
+// const SHEET_API_KEY = "AIzaSyC9KDZwUzc9F2-YdXE1LLa36F1q8nqyGoA"; 
+// const SHEET_ID = "1svZLw2Rp9lq54JlfGT77ehpZLzXw-ulIn7TM4Mo6Dpc";     
+
+const GAS_WEB_APP_URL = "https://script.google.com/macros/library/d/1fc-ZN_PCt2lnmZHXFwkJ3xkCJ7lwkZF2MXqps46-t7P2R07mNSxLNgV6/2";

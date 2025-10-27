@@ -1,8 +1,13 @@
 // js/strategy_share.js
 
 // --------------------------------------------------
-// 💡 학습 전략 공유/저장 로직 (Google Sheets API 연동)
+// 💡 학습 전략 공유/저장 로직 (Google Sheets API -> Apps Script 프록시 연동)
 // --------------------------------------------------
+
+// [!!필수 변경!!] 이 URL은 data.js 파일에 정의되어야 합니다.
+// 401 권한 오류를 해결하기 위해 Google Sheets API 대신 Apps Script(GAS) 웹 앱 URL을 사용합니다.
+const WRITE_GAS_URL = "https://script.google.com/macros/library/d/1fc-ZN_PCt2lnmZHXFwkJ3xkCJ7lwkZF2MXqps46-t7P2R07mNSxLNgV6/2";
+const READ_GAS_URL = "https://script.google.com/macros/library/d/1fc-ZN_PCt2lnmZHXFwkJ3xkCJ7lwkZF2MXqps46-t7P2R07mNSxLNgV6/2";
 
 // DOM 요소
 const saveStrategyButton = document.getElementById('save-strategy-button');
@@ -14,12 +19,12 @@ const writeFeedback = document.getElementById('write-feedback');
 const strategyListContainer = document.getElementById('strategy-list-container');
 const loadingMessage = document.getElementById('loading-message');
 
-// API 엔드포인트 기본 URL (쓰기/읽기)
-const BASE_URL = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values`;
+// API 엔드포인트 기본 URL (Apps Script URL로 대체되어 사용하지 않습니다.)
+// const BASE_URL = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values`;
 
 
 // --------------------------------------------------
-// A. 저장(쓰기) 함수
+// A. 저장(쓰기) 함수 (GAS POST 요청으로 변경)
 // --------------------------------------------------
 
 async function saveStrategy() {
@@ -35,38 +40,42 @@ async function saveStrategy() {
     
     // 타임스탬프를 KST로 설정하여 기록
     const timestamp = new Date().toLocaleString('ko-KR', { timeZone: 'Asia/Seoul' });
-    // [A열 이름, B열 선택 전략, C열 실천 계획, D열 타임스탬프]
-    const dataRow = [name, strategy, plan, timestamp]; 
-
-    // API URL: 쓰기 (append) 요청
-    const url = `${BASE_URL}/${SHEET_RANGE}:append?valueInputOption=USER_ENTERED&key=${SHEET_API_KEY}`;
+    
+    // API URL: 쓰기 요청 (GAS 웹 앱 URL 사용)
+    const url = WRITE_GAS_URL;
 
     try {
         saveStrategyButton.disabled = true;
         saveStrategyButton.textContent = "저장 중...";
         
+        // GAS가 파싱하기 쉬운 JSON 형태로 데이터를 전송합니다.
+        const requestBody = {
+            name: name,
+            strategy: strategy,
+            plan: plan,
+            timestamp: timestamp
+        };
+
         const response = await fetch(url, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({
-                values: [dataRow]
-            })
+            body: JSON.stringify(requestBody)
         });
 
+        // GAS는 보통 status 200을 반환합니다.
         if (response.ok) {
             writeFeedback.textContent = `✅ 전략이 성공적으로 공유되었습니다! (작성자: ${name})`;
             writeFeedback.style.display = 'block';
             document.getElementById('strategy-text').value = ''; // 작성 내용 초기화
         } else {
-            // API 에러 처리 (예: API 키 잘못됨, 권한 없음 등)
             const errorText = await response.text();
-            writeFeedback.textContent = `❌ 저장 실패: 스프레드시트 권한 설정을 확인하세요. (에러: ${errorText.substring(0, 50)}...)`;
+            writeFeedback.textContent = `❌ 저장 실패: Apps Script 설정 또는 URL을 확인하세요. (에러: ${errorText.substring(0, 50)}...)`;
             writeFeedback.style.display = 'block';
         }
     } catch (error) {
-        writeFeedback.textContent = '❌ 네트워크 또는 API 호출 오류가 발생했습니다.';
+        writeFeedback.textContent = '❌ 네트워크 또는 Apps Script 호출 오류가 발생했습니다.';
         writeFeedback.style.display = 'block';
         console.error('Save Strategy Error:', error);
     } finally {
@@ -77,7 +86,7 @@ async function saveStrategy() {
 
 
 // --------------------------------------------------
-// B. 불러오기(읽기) 함수
+// B. 불러오기(읽기) 함수 (GAS GET 요청으로 변경)
 // --------------------------------------------------
 
 async function loadSharedStrategies() {
@@ -85,20 +94,20 @@ async function loadSharedStrategies() {
     loadingMessage.textContent = '전략 목록을 불러오는 중...';
     loadingMessage.style.display = 'block';
     
-    // API URL: 읽기 (get) 요청
-    const readRange = `${SHEET_NAME}!A:D`; 
-    const url = `${BASE_URL}/${readRange}?majorDimension=ROWS&key=${SHEET_API_KEY}`;
+    // API URL: 읽기 요청 (GAS 웹 앱 URL 사용)
+    const url = READ_GAS_URL;
     
     try {
         const response = await fetch(url);
         
         if (!response.ok) {
              const errorText = await response.text();
-             loadingMessage.textContent = `❌ 목록 로드 실패: API 키 또는 Sheet ID를 확인하세요. (에러: ${errorText.substring(0, 50)}...)`;
+             loadingMessage.textContent = `❌ 목록 로드 실패: Apps Script 설정 또는 URL을 확인하세요. (에러: ${errorText.substring(0, 50)}...)`;
              return;
         }
 
         const data = await response.json();
+        // GAS에서 Sheets API의 values 구조를 그대로 반환한다고 가정합니다.
         const values = data.values;
         
         if (!values || values.length <= 1) { // 헤더 행 제외
@@ -132,14 +141,13 @@ async function loadSharedStrategies() {
 
 
 // --------------------------------------------------
-// C. 이벤트 리스너 및 화면 전환 연결
+// C. 이벤트 리스너 및 화면 전환 연결 (페이지 이동 오류 수정 포함)
 // --------------------------------------------------
 
 // 게임이 로드된 후 이벤트 연결
 document.addEventListener('DOMContentLoaded', () => {
-    // document.addEventListener('DOMContentLoaded', () => { ... }); 블록 내부에 추가
-
-    // '나만의 전략 작성하기' 버튼 클릭 시
+    
+    // ① 페이지 이동 오류 수정: '나만의 전략 작성하기' 버튼 클릭 시 리스너 연결
     const goToWriteStrategyButton = document.getElementById('go-to-write-strategy');
     if (goToWriteStrategyButton) {
         goToWriteStrategyButton.addEventListener('click', window.goToWriteStrategy);
