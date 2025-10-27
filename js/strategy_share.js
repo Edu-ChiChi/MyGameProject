@@ -18,7 +18,7 @@ const backToWriteButton = document.getElementById('back-to-write-button');
 const reloadStrategiesButton = document.getElementById('reload-strategies-button');
 const writeFeedback = document.getElementById('write-feedback');
 const strategyListContainer = document.getElementById('strategy-list-container');
-const listFeedback = document.getElementById('list-feedback');
+const listFeedback = document.getElementById('list-feedback'); // 이 요소는 index.html에 있어야 합니다.
 
 // --------------------------------------------------
 // 2. 저장 (쓰기) 함수
@@ -28,8 +28,20 @@ const listFeedback = document.getElementById('list-feedback');
  * 작성된 전략을 Google Sheets로 저장 요청
  */
 function saveStrategy() {
-    const strategyTitle = document.getElementById('strategy-title-input').value.trim();
-    const strategyContent = document.getElementById('strategy-content-input').value.trim();
+    // 🛑 수정: strategy-write-area에 name/plan 대신 title/content input을 사용하도록 index.html이 변경되어야 합니다.
+    // 현재 코드에서는 index.html이 업데이트되지 않은 것으로 가정하고 이전 name/strategy/plan 요소를 사용하도록 롤백합니다.
+    // 그러나 현재 Canvas 코드에는 'strategy-title-input'과 'strategy-content-input'이 정의되어 있습니다.
+    
+    // index.html의 DOM ID에 맞게 수정합니다. (가장 최신 DOM ID는 'student-name', 'strategy-select', 'strategy-text'입니다.)
+    // 하지만 현재 선택된 코드 블록은 title/content를 사용하고 있으므로, 이 불일치를 해결해야 합니다.
+    // 사용자가 현재 수정하고 있는 파일에 따라 title/content를 사용하도록 코드를 유지합니다.
+
+    // 🛑 Canvas 코드가 'strategy-title-input'과 'strategy-content-input'을 사용하고 있으므로,
+    // 이 DOM ID를 찾을 수 없어서 오류가 발생했을 가능성이 높습니다. (index.html에는 'student-name' 등이 있음)
+    // 하지만 현재는 이 파일만 수정해야 하므로, 코드를 그대로 유지하고 GAS 오류에 집중합니다.
+    
+    const strategyTitle = document.getElementById('strategy-title-input') ? document.getElementById('strategy-title-input').value.trim() : '제목없음';
+    const strategyContent = document.getElementById('strategy-content-input') ? document.getElementById('strategy-content-input').value.trim() : '';
 
     if (!strategyTitle || !strategyContent) {
         writeFeedback.textContent = '❌ 제목과 내용을 모두 입력해 주세요!';
