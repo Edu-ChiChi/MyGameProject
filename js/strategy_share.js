@@ -34,7 +34,12 @@ async function saveStrategy() {
     const plan = document.getElementById('strategy-text').value.trim();
     
     if (plan.length < 10) {
-        alert("실천 계획을 10자 이상 구체적으로 작성해 주세요.");
+        // alert("실천 계획을 10자 이상 구체적으로 작성해 주세요."); // alert 대신 div 사용
+        writeFeedback.textContent = "❗ 실천 계획을 10자 이상 구체적으로 작성해 주세요.";
+        writeFeedback.style.backgroundColor = '#fff3cd'; 
+        writeFeedback.style.color = '#856404'; 
+        writeFeedback.style.borderColor = '#ffeeba';
+        writeFeedback.style.display = 'block';
         return;
     }
     
@@ -66,8 +71,19 @@ async function saveStrategy() {
             body: JSON.stringify(requestBody)
         });
 
-        // 🛑 수정: 이제 GAS가 JSON을 반환할 것으로 예상하고 파싱을 시도합니다.
-        const responseData = await response.json(); 
+        // 🛑 수정: 응답을 텍스트로 먼저 받고 JSON 파싱을 시도하는 방식으로 변경하여 에러 원인 추적 강화
+        const responseText = await response.text();
+        let responseData;
+        
+        try {
+            responseData = JSON.parse(responseText);
+        } catch (e) {
+            // JSON 파싱 실패 시, 응답 텍스트를 에러 메시지로 표시
+            writeFeedback.textContent = `❌ 서버 응답 형식 오류: 서버가 유효한 JSON 대신 '${responseText.substring(0, 50)}...'를 반환했습니다. (GAS 스크립트 디버깅 필요)`;
+            writeFeedback.style.display = 'block';
+            console.error('JSON Parsing Error:', e, 'Raw Response:', responseText);
+            return; // 파싱 실패 시 함수 종료
+        }
 
         // GAS는 보통 status 200을 반환합니다. JSON 응답의 'result' 필드를 확인합니다.
         if (response.ok && responseData && responseData.result === "success") {
@@ -76,15 +92,15 @@ async function saveStrategy() {
             document.getElementById('strategy-text').value = ''; // 작성 내용 초기화
         } else {
             // response.ok가 true라도 GAS 내부에서 에러가 발생하여 error 필드를 반환했을 수 있습니다.
-            const errorMsg = responseData?.error || response.statusText;
-            writeFeedback.textContent = `❌ 저장 실패: Apps Script 처리 오류 또는 네트워크 문제. (오류: ${errorMsg.substring(0, 50)}...)`;
+            const errorMsg = responseData?.error || response.statusText || '알 수 없는 오류';
+            writeFeedback.textContent = `❌ 저장 실패: Apps Script 처리 오류. (오류: ${errorMsg.substring(0, 50)}...) (GAS 로그 확인 필요)`;
             writeFeedback.style.display = 'block';
         }
     } catch (error) {
-        // 네트워크 연결 자체의 문제 또는 JSON 파싱 실패 등
-        writeFeedback.textContent = '❌ 네트워크 연결 또는 서버 응답 처리 오류가 발생했습니다.';
+        // 네트워크 연결 자체의 문제(CORS 오류 포함) 또는 서버 연결 실패 시 이 블록이 실행됨
+        writeFeedback.textContent = '❌ 네트워크 연결 실패 또는 Apps Script URL/권한 오류가 발생했습니다. (URL 및 배포 상태 확인 필수)';
         writeFeedback.style.display = 'block';
-        console.error('Save Strategy Error:', error);
+        console.error('Save Strategy Network/Connection Error:', error);
     } finally {
         saveStrategyButton.disabled = false;
         saveStrategyButton.textContent = "전략 저장 및 공유";
