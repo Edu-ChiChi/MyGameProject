@@ -18,7 +18,10 @@ const backToWriteButton = document.getElementById('back-to-write-button');
 const reloadStrategiesButton = document.getElementById('reload-strategies-button');
 const writeFeedback = document.getElementById('write-feedback');
 const strategyListContainer = document.getElementById('strategy-list-container');
-const listFeedback = document.getElementById('list-feedback'); // 이 요소는 index.html에 있어야 합니다.
+// index.html에 list-feedback ID가 정의되지 않았으므로 strategy-view-area 내에서 유사한 요소를 사용하거나 새로 추가해야 하지만, 
+// 현재는 오류를 유발하지 않도록 임시로 null로 둡니다.
+// index.html에 `strategy-view-area` 내에 <p id="list-feedback"></p>를 추가해야 올바르게 작동합니다.
+const listFeedback = document.getElementById('loading-message'); // index.html에 'loading-message'를 피드백 용도로 사용
 
 // --------------------------------------------------
 // 2. 저장 (쓰기) 함수
@@ -28,41 +31,37 @@ const listFeedback = document.getElementById('list-feedback'); // 이 요소는 
  * 작성된 전략을 Google Sheets로 저장 요청
  */
 function saveStrategy() {
-    // 🛑 수정: strategy-write-area에 name/plan 대신 title/content input을 사용하도록 index.html이 변경되어야 합니다.
-    // 현재 코드에서는 index.html이 업데이트되지 않은 것으로 가정하고 이전 name/strategy/plan 요소를 사용하도록 롤백합니다.
-    // 그러나 현재 Canvas 코드에는 'strategy-title-input'과 'strategy-content-input'이 정의되어 있습니다.
-    
-    // index.html의 DOM ID에 맞게 수정합니다. (가장 최신 DOM ID는 'student-name', 'strategy-select', 'strategy-text'입니다.)
-    // 하지만 현재 선택된 코드 블록은 title/content를 사용하고 있으므로, 이 불일치를 해결해야 합니다.
-    // 사용자가 현재 수정하고 있는 파일에 따라 title/content를 사용하도록 코드를 유지합니다.
+    // 🛑 [수정] index.html의 실제 DOM ID를 사용하도록 변경
+    const studentName = document.getElementById('student-name') ? document.getElementById('student-name').value.trim() : '익명';
+    const strategySelect = document.getElementById('strategy-select') ? document.getElementById('strategy-select').value.trim() : '미선택';
+    const strategyContent = document.getElementById('strategy-text') ? document.getElementById('strategy-text').value.trim() : '';
 
-    // 🛑 Canvas 코드가 'strategy-title-input'과 'strategy-content-input'을 사용하고 있으므로,
-    // 이 DOM ID를 찾을 수 없어서 오류가 발생했을 가능성이 높습니다. (index.html에는 'student-name' 등이 있음)
-    // 하지만 현재는 이 파일만 수정해야 하므로, 코드를 그대로 유지하고 GAS 오류에 집중합니다.
+    // 제목 필드 대신 작성자 + 선택 전략을 제목으로 대체 (시나리오상 작성자+내용만 필수)
+    const strategyTitle = `[${strategySelect}] ${studentName}의 전략`; 
     
-    const strategyTitle = document.getElementById('strategy-title-input') ? document.getElementById('strategy-title-input').value.trim() : '제목없음';
-    const strategyContent = document.getElementById('strategy-content-input') ? document.getElementById('strategy-content-input').value.trim() : '';
-
-    if (!strategyTitle || !strategyContent) {
-        writeFeedback.textContent = '❌ 제목과 내용을 모두 입력해 주세요!';
+    if (!strategyContent) { // 전략 내용만 필수 입력으로 가정
+        writeFeedback.textContent = '❌ 실천 계획 내용을 입력해 주세요!';
         writeFeedback.style.color = 'var(--color-danger)';
+        writeFeedback.style.display = 'block';
         return;
     }
-
-    // 현재 선택된 전략 타입 (예: behaviorism, cognitivism)
-    const strategyType = gameState.currentStrategy || '미선택'; 
+    
+    // 현재 선택된 전략 타입 (예: behaviorism, cognitivism) -> index.html의 select 값으로 대체
+    const strategyType = strategySelect; 
 
     const data = {
         action: 'write',
-        title: strategyTitle,
+        title: strategyTitle, // 조합된 제목 사용
         content: strategyContent,
         type: strategyType,
+        // (참고: GAS에 전달되는 데이터 순서가 배열로 처리되므로, GAS 스크립트에서 이 순서에 맞게 처리되어야 합니다.)
         date: new Date().toLocaleDateString('ko-KR'),
         time: new Date().toLocaleTimeString('ko-KR')
     };
 
     writeFeedback.textContent = '⏳ 전략을 저장 중입니다...';
     writeFeedback.style.color = 'var(--color-secondary)';
+    writeFeedback.style.display = 'block'; // 피드백 표시
     
     // 로딩 상태를 표시하는 동안 버튼을 비활성화
     saveStrategyButton.disabled = true;
@@ -91,18 +90,18 @@ function saveStrategy() {
             return data;
         }).catch(e => {
              // JSON 파싱 자체에 실패한 경우 (GAS가 JSON이 아닌 HTML 등을 반환)
-             throw new Error(`GAS 응답 파싱 오류. 서버 응답이 유효한 JSON 형식이 아닙니다.`);
+             throw new Error(`GAS 응답 파싱 오류. 서버 응답이 유효한 JSON 형식이 아닙니다. (GAS 웹 앱 배포 설정 확인)`);
         });
     })
     .then(data => {
         // 성공 처리
         writeFeedback.textContent = '✅ 전략이 성공적으로 저장되었습니다! 목록에서 확인해 보세요.';
         writeFeedback.style.color = 'var(--color-success)';
-        document.getElementById('strategy-title-input').value = '';
-        document.getElementById('strategy-content-input').value = '';
+        // document.getElementById('strategy-title-input').value = ''; // 제거
+        document.getElementById('strategy-text').value = '';
 
         // 성공 후 목록 새로고침
-        loadSharedStrategies();
+        // loadSharedStrategies(); // 저장 후 자동으로 목록을 로드할 필요는 없습니다. 사용자가 목록 보기를 누를 때 로드
     })
     .catch(error => {
         // 네트워크 오류 또는 커스텀 throw된 오류가 여기서 잡힙니다.
@@ -118,6 +117,7 @@ function saveStrategy() {
             if (writeFeedback.textContent.startsWith('🚨') || writeFeedback.textContent.startsWith('✅')) {
                 // 성공 또는 실패 메시지는 유지
             } else {
+                writeFeedback.style.display = 'none';
                 writeFeedback.textContent = '';
             }
         }, 5000);
@@ -134,8 +134,13 @@ function saveStrategy() {
  */
 function loadSharedStrategies() {
     strategyListContainer.innerHTML = '';
-    listFeedback.textContent = '⏳ 공유된 전략 목록을 불러오는 중입니다...';
-    listFeedback.style.color = 'var(--color-secondary)';
+    
+    // 🛑 [수정] listFeedback 대신 loading-message를 사용하고, 스타일을 직접 적용합니다.
+    if(listFeedback) {
+        listFeedback.textContent = '⏳ 공유된 전략 목록을 불러오는 중입니다...';
+        listFeedback.style.color = 'var(--color-secondary)';
+        listFeedback.style.display = 'block';
+    }
 
     // Apps Script에 읽기 요청을 보냅니다.
     // 'read' 액션 파라미터를 추가하여 GAS에서 읽기 함수가 실행되도록 유도합니다.
@@ -152,10 +157,14 @@ function loadSharedStrategies() {
         return response.json();
     })
     .then(data => {
+        // 🛑 [수정] loading-message/listFeedback 업데이트 로직
         if (data.error) {
             // Apps Script에서 명시적으로 오류를 반환한 경우
-            listFeedback.textContent = `🚨 전략 로딩 오류: ${data.error}`;
-            listFeedback.style.color = 'var(--color-danger)';
+            if(listFeedback) {
+                listFeedback.textContent = `🚨 전략 로딩 오류: ${data.error}`;
+                listFeedback.style.color = 'var(--color-danger)';
+                listFeedback.style.display = 'block';
+            }
             console.error('Apps Script Error:', data.error);
             return;
         }
@@ -169,10 +178,15 @@ function loadSharedStrategies() {
                 // 줄바꿈 문자 처리
                 const displayContent = content ? content.replace(/\n/g, '<br>') : '';
                 
+                // 전략 Type에 따라 badge 클래스 생성
+                const typeClass = type === '행동주의' ? 'behaviorism' : 
+                                  type === '인지주의' ? 'cognitivism' : 
+                                  type === '구성주의' ? 'constructivism' : 'secondary';
+                
                 return `
                     <div class="strategy-item">
                         <div class="strategy-header">
-                            <span class="strategy-type badge ${type.toLowerCase()}">${type}</span>
+                            <span class="strategy-type badge ${typeClass}">${type}</span>
                             <h5 class="strategy-title">${title}</h5>
                             <span class="strategy-datetime">${date} ${time}</span>
                         </div>
@@ -182,24 +196,34 @@ function loadSharedStrategies() {
             }).join('');
             
             strategyListContainer.innerHTML = html;
-            listFeedback.textContent = `✅ 총 ${data.length}개의 전략이 성공적으로 로드되었습니다.`;
-            listFeedback.style.color = 'var(--color-success)';
+            if(listFeedback) {
+                listFeedback.textContent = `✅ 총 ${data.length}개의 전략이 성공적으로 로드되었습니다.`;
+                listFeedback.style.color = 'var(--color-success)';
+                listFeedback.style.display = 'block';
+            }
 
         } else {
             strategyListContainer.innerHTML = '<p class="text-center">아직 공유된 학습 전략이 없습니다. 첫 번째 전략을 작성해 보세요!</p>';
-            listFeedback.textContent = '💡 전략 목록이 비어 있습니다.';
-            listFeedback.style.color = 'var(--color-secondary)';
+            if(listFeedback) {
+                listFeedback.textContent = '💡 전략 목록이 비어 있습니다.';
+                listFeedback.style.color = 'var(--color-secondary)';
+                listFeedback.style.display = 'block';
+            }
         }
     })
     .catch(error => {
         console.error('전략 목록 로드 중 오류 발생:', error);
-        listFeedback.textContent = `🚨 전략 목록 로드 실패: ${error.message}`;
-        listFeedback.style.color = 'var(--color-danger)';
+        if(listFeedback) {
+            listFeedback.textContent = `🚨 전략 목록 로드 실패: ${error.message}`;
+            listFeedback.style.color = 'var(--color-danger)';
+            listFeedback.style.display = 'block';
+        }
     })
     .finally(() => {
         // 5초 후 메시지 초기화
         setTimeout(() => {
-            if (listFeedback.textContent.startsWith('⏳')) {
+            if (listFeedback && listFeedback.textContent.startsWith('⏳')) {
+                 listFeedback.style.display = 'none';
                  listFeedback.textContent = '';
             }
         }, 5000);
@@ -216,16 +240,19 @@ document.addEventListener('DOMContentLoaded', () => {
     // 여기서도 안전하게 추가합니다. (index.html의 resolution-area에 있는 버튼)
     const goToWriteStrategyButton = document.getElementById('go-to-write-strategy');
     if (goToWriteStrategyButton) {
+        goToWriteStrategyButton.removeEventListener('click', window.goToWriteStrategy); // 중복 방지
         goToWriteStrategyButton.addEventListener('click', window.goToWriteStrategy);
     }
     
     // 저장 버튼 클릭 시
     if (saveStrategyButton) {
+        saveStrategyButton.removeEventListener('click', saveStrategy); // 중복 방지
         saveStrategyButton.addEventListener('click', saveStrategy);
     }
     
     // 목록 보기 버튼 클릭 시 (작성 화면 -> 목록 화면)
     if (viewStrategiesButton && window.showScreen) {
+        viewStrategiesButton.removeEventListener('click', () => { /* no-op */ }); // 중복 방지
         viewStrategiesButton.addEventListener('click', () => {
             window.showScreen('strategy-view-area');
             loadSharedStrategies(); // 화면 전환 시 목록 로드
@@ -234,11 +261,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // 목록 새로고침 버튼 클릭 시
     if (reloadStrategiesButton) {
+        reloadStrategiesButton.removeEventListener('click', loadSharedStrategies); // 중복 방지
         reloadStrategiesButton.addEventListener('click', loadSharedStrategies);
     }
 
     // 뒤로 가기 버튼 연결 (작성 -> 결과)
     if (backToResolutionButton && window.showScreen) {
+        backToResolutionButton.removeEventListener('click', () => { /* no-op */ }); // 중복 방지
         backToResolutionButton.addEventListener('click', () => {
             window.showScreen('resolution-area', gameState.currentStrategy);
         });
@@ -246,6 +275,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // 뒤로 가기 버튼 연결 (목록 -> 작성)
     if (backToWriteButton && window.showScreen) {
+        backToToWriteButton.removeEventListener('click', () => { /* no-op */ }); // 중복 방지
         backToToWriteButton.addEventListener('click', () => {
             window.showScreen('strategy-write-area');
         });
@@ -257,29 +287,20 @@ window.goToWriteStrategy = function() {
     if (window.showScreen) {
         window.showScreen('strategy-write-area');
         
-        // 제목 자동 완성
-        const type = gameState.currentStrategy;
-        let titlePlaceholder = '나만의 학습 전략';
-        if (type === 'behaviorism') titlePlaceholder = '행동주의 기반 학습 전략: 목표 달성 기록';
-        if (type === 'cognitivism') titlePlaceholder = '인지주의 기반 학습 전략: 개념 연결법';
-        if (type === 'constructivism') titlePlaceholder = '구성주의 기반 학습 전략: 협력 비계 활용법';
-        
-        // 🛑 수정: index.html에 존재하는 ID로 변경 (student-name과 strategy-text를 초기화)
-        // document.getElementById('strategy-title-input').value = titlePlaceholder; // 삭제 또는 수정
+        // 🛑 [수정] index.html에 존재하는 ID로 변경 및 초기값 설정
         document.getElementById('student-name').value = '익명'; // 이름/닉네임 기본값 설정
         document.getElementById('strategy-text').value = ''; // 내용 초기화
         
         writeFeedback.textContent = '💡 나만의 학습 전략을 작성하고 공유해 보세요!';
         writeFeedback.style.color = 'var(--color-dark)';
-
-        // 🛑 추가: strategy-select의 값도 현재 전략으로 업데이트
+        writeFeedback.style.display = 'block'; // 피드백 표시
+        
+        // 🛑 [수정] strategy-select의 값도 현재 전략으로 업데이트
         const strategySelect = document.getElementById('strategy-select');
         if (strategySelect) {
             // strategyMap을 사용하여 한글 이름으로 업데이트
+            // data.js가 로드되어 strategyMap이 존재한다고 가정
             strategySelect.value = strategyMap[gameState.currentStrategy] || '행동주의'; 
         }
     }
 };
-
-// 최초 로딩 시 목록을 바로 로드할 필요는 없습니다. 사용자가 '목록 보기'를 눌렀을 때 로드됩니다.
-// window.loadSharedStrategies = loadSharedStrategies; // 외부에서 호출될 수 있도록 노출
