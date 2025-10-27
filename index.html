@@ -111,6 +111,47 @@
             </div>
 
         </section>
+        
+        <section id="strategy-write-area" class="screen" style="display:none;">
+            <h2>나만의 학습 전략 작성 및 공유하기</h2>
+            <p>미션 수행 경험을 바탕으로, 나만의 학습 전략을 작성하여 친구들과 공유해 보세요.</p>
+    
+        <div class="mentoring-dialogue">
+            <label for="student-name">작성자 (익명/닉네임):</label>
+            <input type="text" id="student-name" class="strategy-input" placeholder="이름 또는 닉네임을 입력하세요">
+
+            <label for="strategy-select" style="margin-top: 15px;">선택한 전략:</label>
+            <select id="strategy-select" class="strategy-input">
+                <option value="행동주의">행동주의</option>
+                <option value="인지주의">인지주의</option>
+                <option value="구성주의">구성주의</option>
+            </select>
+        
+            <label for="strategy-text" style="margin-top: 15px;">나만의 실천 계획:</label>
+            <textarea id="strategy-text" rows="5" class="strategy-input" placeholder="어떻게, 언제, 무엇을 할지 구체적인 실천 계획을 작성해 보세요."></textarea>
+        
+            <div class="button-group" style="margin-top: 20px;">
+                <button id="save-strategy-button" class="action-button primary">전략 저장 및 공유</button>
+                <button id="go-to-view-button" class="action-button secondary">공유된 전략 목록 보기</button>
+                <button id="back-to-resolution-button" class="action-button secondary">결과 화면으로 복귀</button>
+            </div>
+            <div id="write-feedback" class="feedback-hint" style="display:none; background-color: #fff3cd; color: #856404; border-color: #ffeeba;"></div>
+        </div>
+    </section>
+
+    <section id="strategy-view-area" class="screen" style="display:none;">
+        <h2>모두가 공유 가능한 학습 전략 목록</h2>
+        <p>친구들이 작성한 독창적인 전략들을 참고해 보세요! (최신순 로드)</p>
+    
+        <div id="strategy-list-container" class="card-list" style="flex-direction: column; gap: 10px;">
+            <p id="loading-message" style="text-align: center;">전략 목록을 불러오는 중...</p>
+        </div>
+    
+        <div class="button-group">
+            <button id="reload-strategies-button" class="action-button secondary">목록 새로고침</button>
+            <button id="back-to-write-button" class="action-button danger">전략 작성 화면으로 돌아가기</button>
+        </div>
+    </section>
 
         <section id="resolution-area" class="screen" style="display:none;">
             <div class="resolution-box">
@@ -119,6 +160,7 @@
                     <p id="resolution-message"></p>
                 </div>
                 <div class="button-group">
+                    <button id="go-to-write-strategy" class="action-button primary">나만의 전략 작성하기</button> 
                     <button id="restart-button" class="action-button secondary">다른 전략 체험하기</button>
                 </div>
             </div>
@@ -160,6 +202,7 @@
     <script src="js/cognitivism.js"></script>
     <script src="js/constructivism.js"></script>
     <script src="js/crossword.js"></script> 
+    <script src="js/strategy_share.js"></script>
     
 </body>
 </html>

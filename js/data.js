@@ -108,3 +108,12 @@ const strategyMap = {
     'cognitivism': '인지주의',
     'constructivism': '구성주의'
 };
+
+// --------------------------------------------------
+// 🚀 6. Google Sheets API 연동을 위한 상수
+// --------------------------------------------------
+const SHEET_API_KEY = "AIzaSyC9KDZwUzc9F2-YdXE1LLa36F1q8nqyGoA"; 
+const SHEET_ID = "1svZLw2Rp9lq54JlfGT77ehpZLzXw-ulIn7TM4Mo6Dpc";     
+const SHEET_NAME = "학습전략";          
+// A열: 이름, B열: 선택 전략, C열: 실천 계획, D열: 타임스탬프 (자동 추가)
+const SHEET_RANGE = `${SHEET_NAME}!A:D`;
