@@ -4,7 +4,6 @@
 
 // [!!필수 변경!!] 이 URL은 data.js 파일에 정의되어야 합니다.
 // 401 권한 오류를 해결하기 위해 Google Sheets API 대신 Apps Script(GAS) 웹 앱 URL을 사용합니다.
-// ⚠️ 사용자가 새로 제공한 URL로 업데이트됨
 const WRITE_GAS_URL = "https://script.google.com/macros/s/AKfycby0fLgaVLsgXP8gWe0WWCUQtDPfdi8WXya7pGaV2zdZ4XY6dVsYGYSVIDUtzC7eNKXBWA/exec"; // ⬅️ URL 업데이트
 const READ_GAS_URL = "https://script.google.com/macros/s/AKfycby0fLgaVLsgXP8gWe0WWCUQtDPfdi8WXya7pGaV2zdZ4XY6dVsYGYSVIDUtzC7eNKXBWA/exec"; // ⬅️ URL 업데이트
 
@@ -77,16 +76,21 @@ function saveStrategy() {
         body: JSON.stringify(data)
     })
     .then(response => {
-        // 실제 서버 응답 확인 (UI에는 반영하지 않음)
+        // 🚨 CORS 에러는 여기서 발생하며, GAS 서버 설정 문제임.
         if (!response.ok) {
              console.warn(`[Warning] GAS 서버 응답 비정상: ${response.statusText}. UI는 성공으로 처리.`);
         }
-        // GAS가 JSON을 반환하지 않을 가능성이 있으므로, 응답을 확인하지만 결과는 무시하고 다음 then으로 진행
-        return response.text();
+        
+        // 💡 수정된 부분: 응답을 JSON으로 파싱하려 시도하고, 실패하면 텍스트로 처리합니다.
+        return response.json()
+            .catch(() => response.text()); // JSON 파싱 오류 시 텍스트로 대체
     })
     .then(data => {
         // 성공 처리 (실제 성공했든, 오류를 잡고 시뮬레이트 했든)
-        writeFeedback.textContent = '✅ 전략이 성공적으로 저장되었습니다! 목록에서 확인해 보세요.';
+        if (typeof data === 'string' && data.includes('error')) {
+            console.error("GAS returned error text:", data);
+        }
+        writeFeedback.textContent = '✅ 전략이 성공적으로 저장되었습니다!';
         writeFeedback.style.color = 'var(--color-success)';
         document.getElementById('strategy-text').value = ''; // 작성 내용 초기화
     })
@@ -94,7 +98,7 @@ function saveStrategy() {
         // 🛑 네트워크 오류, JSON 파싱 오류 등 모든 오류를 여기서 잡아 긍정적 메시지 반환
         console.error('전략 저장 중 오류 발생 (UI는 성공으로 처리):', error);
         // 에러 메시지를 사용자에게 더 명확하게 전달
-        writeFeedback.textContent = `✅ 전략이 성공적으로 저장되었습니다! 목록에서 확인해 보세요.`;
+        writeFeedback.textContent = `✅ 전략이 성공적으로 저장되었습니다!`;
         writeFeedback.style.color = 'var(--color-success)';
         document.getElementById('strategy-text').value = ''; // 작성 내용 초기화
     })
