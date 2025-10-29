@@ -18,17 +18,15 @@ const backToWriteButton = document.getElementById('back-to-write-button');
 const reloadStrategiesButton = document.getElementById('reload-strategies-button');
 const writeFeedback = document.getElementById('write-feedback');
 const strategyListContainer = document.getElementById('strategy-list-container');
-// index.html에 list-feedback ID가 정의되지 않았으므로 strategy-view-area 내에서 유사한 요소를 사용하거나 새로 추가해야 하지만, 
-// 현재는 오류를 유발하지 않도록 임시로 null로 둡니다.
-// index.html에 `strategy-view-area` 내에 <p id="list-feedback"></p>를 추가해야 올바르게 작동합니다.
-const listFeedback = document.getElementById('loading-message'); // index.html에 'loading-message'를 피드백 용도로 사용
+// index.html에 'loading-message'를 피드백 용도로 사용
+const listFeedback = document.getElementById('loading-message'); 
 
 // --------------------------------------------------
-// 2. 저장 (쓰기) 함수
+// 2. 저장 (쓰기) 함수 (요청에 따라 성공/실패와 무관하게 긍정적 메시지 반환)
 // --------------------------------------------------
 
 /**
- * 작성된 전략을 Google Sheets로 저장 요청
+ * 작성된 전략을 Google Sheets로 저장 요청 (UI는 성공적으로 저장된 것처럼 처리)
  */
 function saveStrategy() {
     // 🛑 [수정] index.html의 실제 DOM ID를 사용하도록 변경
@@ -59,7 +57,11 @@ function saveStrategy() {
         time: new Date().toLocaleTimeString('ko-KR')
     };
 
-    writeFeedback.textContent = '⏳ 전략을 저장 중입니다...';
+    // 로컬 상태 저장 (로컬 기기에 내용은 유지)
+    localStorage.setItem('lastSavedStrategy', JSON.stringify({ name: studentName, type: strategySelect, content: strategyContent }));
+
+    // 🛑 모든 오류 상황에 대해 이 메시지를 반환하기 위해 fetch 시작 전에 표시
+    writeFeedback.textContent = '⏳ 전략을 저장 중입니다...'; 
     writeFeedback.style.color = 'var(--color-secondary)';
     writeFeedback.style.display = 'block'; // 피드백 표시
     
@@ -68,54 +70,39 @@ function saveStrategy() {
 
     fetch(WRITE_GAS_URL, {
         method: 'POST',
-        // 🛑 수정: mode: 'no-cors'를 제거하여 응답 상태를 확인하고 JSON을 파싱할 수 있도록 합니다.
         headers: {
             'Content-Type': 'application/json',
         },
         body: JSON.stringify(data)
     })
     .then(response => {
-        // 응답 상태가 200-299가 아니면 직접 에러 발생 (권한/URL 오류 확인)
+        // 실제 서버 응답 확인 (UI에는 반영하지 않음)
         if (!response.ok) {
-             const errorStatus = response.statusText || `HTTP Error ${response.status}`;
-             throw new Error(`GAS 서버 응답 오류: ${errorStatus}. 권한 또는 URL 확인 필요.`);
+             console.warn(`[Warning] GAS 서버 응답 비정상: ${response.statusText}. UI는 성공으로 처리.`);
         }
-        
-        // 정상 응답이라면 JSON 파싱을 시도
-        return response.json().then(data => {
-            if (data.error) {
-                // GAS 스크립트 내부에서 에러 처리 후 JSON으로 반환한 경우
-                 throw new Error(`GAS 스크립트 오류: ${data.error}`);
-            }
-            return data;
-        }).catch(e => {
-             // JSON 파싱 자체에 실패한 경우 (GAS가 JSON이 아닌 HTML 등을 반환)
-             throw new Error(`GAS 응답 파싱 오류. 서버 응답이 유효한 JSON 형식이 아닙니다. (GAS 웹 앱 배포 설정 확인)`);
-        });
+        // GAS가 JSON을 반환하지 않을 가능성이 있으므로, 응답을 확인하지만 결과는 무시하고 다음 then으로 진행
+        return response.text();
     })
     .then(data => {
-        // 성공 처리
+        // 성공 처리 (실제 성공했든, 오류를 잡고 시뮬레이트 했든)
         writeFeedback.textContent = '✅ 전략이 성공적으로 저장되었습니다! 목록에서 확인해 보세요.';
         writeFeedback.style.color = 'var(--color-success)';
-        // document.getElementById('strategy-title-input').value = ''; // 제거
-        document.getElementById('strategy-text').value = '';
-
-        // 성공 후 목록 새로고침
-        // loadSharedStrategies(); // 저장 후 자동으로 목록을 로드할 필요는 없습니다. 사용자가 목록 보기를 누를 때 로드
+        document.getElementById('strategy-text').value = ''; // 작성 내용 초기화
     })
     .catch(error => {
-        // 네트워크 오류 또는 커스텀 throw된 오류가 여기서 잡힙니다.
-        console.error('전략 저장 중 오류 발생:', error);
+        // 🛑 네트워크 오류, JSON 파싱 오류 등 모든 오류를 여기서 잡아 긍정적 메시지 반환
+        console.error('전략 저장 중 오류 발생 (UI는 성공으로 처리):', error);
         // 에러 메시지를 사용자에게 더 명확하게 전달
-        writeFeedback.textContent = `🚨 전략 저장 실패: ${error.message}`;
-        writeFeedback.style.color = 'var(--color-danger)';
+        writeFeedback.textContent = `✅ 전략이 성공적으로 저장되었습니다! 목록에서 확인해 보세요.`;
+        writeFeedback.style.color = 'var(--color-success)';
+        document.getElementById('strategy-text').value = ''; // 작성 내용 초기화
     })
     .finally(() => {
         saveStrategyButton.disabled = false;
         // 5초 후 메시지 초기화
         setTimeout(() => {
-            if (writeFeedback.textContent.startsWith('🚨') || writeFeedback.textContent.startsWith('✅')) {
-                // 성공 또는 실패 메시지는 유지
+            if (writeFeedback.textContent.startsWith('✅')) {
+                // 성공 메시지(시뮬레이션 포함)는 유지
             } else {
                 writeFeedback.style.display = 'none';
                 writeFeedback.textContent = '';
@@ -126,105 +113,47 @@ function saveStrategy() {
 
 
 // --------------------------------------------------
-// 3. 목록 불러오기 (읽기) 함수
+// 3. 목록 불러오기 (읽기) 함수 (요청에 따라 로딩 메시지만 반환)
 // --------------------------------------------------
 
 /**
- * 저장된 전략 목록을 Google Sheets에서 불러오기 요청
+ * 저장된 전략 목록을 Google Sheets에서 불러오기 요청 (항상 로딩 메시지만 표시)
  */
 function loadSharedStrategies() {
-    strategyListContainer.innerHTML = '';
+    strategyListContainer.innerHTML = ''; // 목록 영역 비우기
     
-    // 🛑 [수정] listFeedback 대신 loading-message를 사용하고, 스타일을 직접 적용합니다.
+    // 🛑 loading-message를 사용하고, 스타일을 직접 적용합니다.
     if(listFeedback) {
+        // 요청에 따라 항상 '불러오는 중입니다...' 메시지만 표시
         listFeedback.textContent = '⏳ 공유된 전략 목록을 불러오는 중입니다...';
         listFeedback.style.color = 'var(--color-secondary)';
         listFeedback.style.display = 'block';
     }
 
     // Apps Script에 읽기 요청을 보냅니다.
-    // 'read' 액션 파라미터를 추가하여 GAS에서 읽기 함수가 실행되도록 유도합니다.
     const url = `${READ_GAS_URL}?action=read`;
 
     fetch(url)
     .then(response => {
-        // 응답 상태 확인
+        // 응답 상태 확인 (실제 fetch는 시도하지만, 결과는 무시)
         if (!response.ok) {
-            const errorStatus = response.statusText || `HTTP Error ${response.status}`;
-            throw new Error(`GAS 서버 응답 오류: ${errorStatus}. 권한 또는 URL 확인 필요.`);
+            console.warn(`[Warning] Load attempt failed: ${response.statusText}. Displaying loading message.`);
         }
-        // GAS는 JSON을 반환해야 합니다.
-        return response.json();
+        return response.text(); // JSON 파싱 대신 텍스트로 받아 오류 방지
     })
     .then(data => {
-        // 🛑 [수정] loading-message/listFeedback 업데이트 로직
-        if (data.error) {
-            // Apps Script에서 명시적으로 오류를 반환한 경우
-            if(listFeedback) {
-                listFeedback.textContent = `🚨 전략 로딩 오류: ${data.error}`;
-                listFeedback.style.color = 'var(--color-danger)';
-                listFeedback.style.display = 'block';
-            }
-            console.error('Apps Script Error:', data.error);
-            return;
-        }
-
-        if (data && data.length > 0) {
-            // 시트 데이터 처리
-            const html = data.map(strategy => {
-                // 시트 열 순서: Type, Title, Content, Date, Time (GAS에서 전달하는 배열 순서)
-                const [type, title, content, date, time] = strategy;
-                
-                // 줄바꿈 문자 처리
-                const displayContent = content ? content.replace(/\n/g, '<br>') : '';
-                
-                // 전략 Type에 따라 badge 클래스 생성
-                const typeClass = type === '행동주의' ? 'behaviorism' : 
-                                  type === '인지주의' ? 'cognitivism' : 
-                                  type === '구성주의' ? 'constructivism' : 'secondary';
-                
-                return `
-                    <div class="strategy-item">
-                        <div class="strategy-header">
-                            <span class="strategy-type badge ${typeClass}">${type}</span>
-                            <h5 class="strategy-title">${title}</h5>
-                            <span class="strategy-datetime">${date} ${time}</span>
-                        </div>
-                        <p class="strategy-content">${displayContent}</p>
-                    </div>
-                `;
-            }).join('');
-            
-            strategyListContainer.innerHTML = html;
-            if(listFeedback) {
-                listFeedback.textContent = `✅ 총 ${data.length}개의 전략이 성공적으로 로드되었습니다.`;
-                listFeedback.style.color = 'var(--color-success)';
-                listFeedback.style.display = 'block';
-            }
-
-        } else {
-            strategyListContainer.innerHTML = '<p class="text-center">아직 공유된 학습 전략이 없습니다. 첫 번째 전략을 작성해 보세요!</p>';
-            if(listFeedback) {
-                listFeedback.textContent = '💡 전략 목록이 비어 있습니다.';
-                listFeedback.style.color = 'var(--color-secondary)';
-                listFeedback.style.display = 'block';
-            }
-        }
+        // 성공/실패와 무관하게 UI 업데이트 로직 생략
+        console.log("Load attempt finished, UI remains 'Loading...'.");
     })
     .catch(error => {
-        console.error('전략 목록 로드 중 오류 발생:', error);
-        if(listFeedback) {
-            listFeedback.textContent = `🚨 전략 목록 로드 실패: ${error.message}`;
-            listFeedback.style.color = 'var(--color-danger)';
-            listFeedback.style.display = 'block';
-        }
+        // 오류가 발생해도 UI 업데이트 로직 생략
+        console.error('전략 목록 로드 중 오류 발생 (UI는 로딩 메시지 유지):', error);
     })
     .finally(() => {
-        // 5초 후 메시지 초기화
+        // 5초 후 메시지 초기화 (로딩 메시지를 5초간 유지)
         setTimeout(() => {
             if (listFeedback && listFeedback.textContent.startsWith('⏳')) {
-                 listFeedback.style.display = 'none';
-                 listFeedback.textContent = '';
+                 // 로딩 메시지를 계속 표시하도록 유지
             }
         }, 5000);
     });
@@ -301,6 +230,21 @@ window.goToWriteStrategy = function() {
             // strategyMap을 사용하여 한글 이름으로 업데이트
             // data.js가 로드되어 strategyMap이 존재한다고 가정
             strategySelect.value = strategyMap[gameState.currentStrategy] || '행동주의'; 
+        }
+
+        // 로컬 저장소에 남아 있는 마지막 작성 내용 불러오기 (사용자가 작성 중 이탈 시 복구)
+        const lastStrategy = localStorage.getItem('lastSavedStrategy');
+        if (lastStrategy) {
+            try {
+                const { name, type, content } = JSON.parse(lastStrategy);
+                document.getElementById('student-name').value = name || '익명';
+                document.getElementById('strategy-text').value = content || '';
+                if (strategySelect) strategySelect.value = type || '행동주의';
+                writeFeedback.textContent = 'ℹ️ 마지막으로 작성한 내용이 로드되었습니다.';
+                writeFeedback.style.color = 'var(--color-info)';
+            } catch (e) {
+                console.error("Failed to load strategy from localStorage", e);
+            }
         }
     }
 };
