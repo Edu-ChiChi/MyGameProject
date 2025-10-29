@@ -217,7 +217,7 @@ window.goToWriteStrategy = function() {
         window.showScreen('strategy-write-area');
         
         // 🛑 [수정] index.html에 존재하는 ID로 변경 및 초기값 설정
-        document.getElementById('student-name').value = '익명'; // 이름/닉네임 기본값 설정
+        document.getElementById('student-name').value = ''; // 이름/닉네임 기본값 설정
         document.getElementById('strategy-text').value = ''; // 내용 초기화
         
         writeFeedback.textContent = '💡 나만의 학습 전략을 작성하고 공유해 보세요!';
