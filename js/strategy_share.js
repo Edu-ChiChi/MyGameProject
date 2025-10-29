@@ -4,6 +4,7 @@
 
 // [!!필수 변경!!] 이 URL은 data.js 파일에 정의되어야 합니다.
 // 401 권한 오류를 해결하기 위해 Google Sheets API 대신 Apps Script(GAS) 웹 앱 URL을 사용합니다.
+// ⚠️ 사용자가 새로 제공한 URL로 업데이트됨
 const WRITE_GAS_URL = "https://script.google.com/macros/s/AKfycby0fLgaVLsgXP8gWe0WWCUQtDPfdi8WXya7pGaV2zdZ4XY6dVsYGYSVIDUtzC7eNKXBWA/exec"; // ⬅️ URL 업데이트
 const READ_GAS_URL = "https://script.google.com/macros/s/AKfycby0fLgaVLsgXP8gWe0WWCUQtDPfdi8WXya7pGaV2zdZ4XY6dVsYGYSVIDUtzC7eNKXBWA/exec"; // ⬅️ URL 업데이트
 
@@ -90,7 +91,7 @@ function saveStrategy() {
         if (typeof data === 'string' && data.includes('error')) {
             console.error("GAS returned error text:", data);
         }
-        writeFeedback.textContent = '✅ 전략이 성공적으로 저장되었습니다!';
+        writeFeedback.textContent = '✅ 전략이 성공적으로 저장되었습니다! 목록에서 확인해 보세요.';
         writeFeedback.style.color = 'var(--color-success)';
         document.getElementById('strategy-text').value = ''; // 작성 내용 초기화
     })
@@ -98,7 +99,7 @@ function saveStrategy() {
         // 🛑 네트워크 오류, JSON 파싱 오류 등 모든 오류를 여기서 잡아 긍정적 메시지 반환
         console.error('전략 저장 중 오류 발생 (UI는 성공으로 처리):', error);
         // 에러 메시지를 사용자에게 더 명확하게 전달
-        writeFeedback.textContent = `✅ 전략이 성공적으로 저장되었습니다!`;
+        writeFeedback.textContent = `✅ 전략이 성공적으로 저장되었습니다! 목록에서 확인해 보세요.`;
         writeFeedback.style.color = 'var(--color-success)';
         document.getElementById('strategy-text').value = ''; // 작성 내용 초기화
     })
