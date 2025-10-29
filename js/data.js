@@ -114,4 +114,4 @@ const strategyMap = {
 // const SHEET_API_KEY = "AIzaSyC9KDZwUzc9F2-YdXE1LLa36F1q8nqyGoA"; 
 // const SHEET_ID = "1svZLw2Rp9lq54JlfGT77ehpZLzXw-ulIn7TM4Mo6Dpc";     
 
-const GAS_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbznDVS626UV8mpRqKjgTJCyhgRLI41_Awfs-Cwv6RpXamhGB6L7DIWAiZDsquWE3ZT0bg/exec";
+const GAS_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbw0fsQhaFh1b03YFfoU0P176dATCzsTan2YlZA6B8BpBjm5K2FC7ZyoSw4Q4AW2MtGj0Q/exec";
