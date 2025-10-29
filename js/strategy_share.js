@@ -5,10 +5,8 @@
 // --------------------------------------------------
 
 // [!!필수 변경!!] 이 URL은 data.js 파일에 정의되어야 합니다.
-// 401 권한 오류를 해결하기 위해 Google Sheets API 대신 Apps Script(GAS) 웹 앱 URL을 사용합니다.
-// ⚠️ 사용자가 새로 제공한 URL로 업데이트됨
-const WRITE_GAS_URL = "https://script.google.com/macros/s/AKfycbyFQOmChE8nscxH5mBillJ0hbTz7vg6N5UKevZAJc-5be_Z9kA5sjKjfiruLcYnr43tRA/exec";
-const READ_GAS_URL = "https://script.google.com/macros/s/AKfycbyFQOmChE8nscxH5mBillJ0hbTz7vg6N5UKevZAJc-5be_Z9kA5sjKjfiruLcYnr43tRA/exec";
+const WRITE_GAS_URL = "https://script.google.com/macros/s/AKfycby0fLgaVLsgXP8gWe0WWCUQtDPfdi8WXya7pGaV2zdZ4XY6dVsYGYSVIDUtzC7eNKXBWA/exec";
+const READ_GAS_URL = "https://script.google.com/macros/s/AKfycby0fLgaVLsgXP8gWe0WWCUQtDPfdi8WXya7pGaV2zdZ4XY6dVsYGYSVIDUtzC7eNKXBWA/exec";
 
 // DOM 요소
 const saveStrategyButton = document.getElementById('save-strategy-button');
