@@ -22,7 +22,7 @@ const behaviorismTasks = [
     { id: 3, title: "교과서 10분 읽기", type: 'reinforcement', correct: true, value: 1, action: "선택" },
     
     // 처벌 작업 (나쁜 습관, -1)
-    { id: 101, title: "공부 중 SNS 알림 확인", type: 'punishment', correct: false, value: -1, action: "선택" },
+    { id: 101, title: "공부 중 멈추고 SNS 알림 확인", type: 'punishment', correct: false, value: -1, action: "선택" },
     { id: 102, title: "숙제를 미루고 게임하기", type: 'punishment', correct: false, value: -1, action: "선택" },
 ];
 let currentTasks = []; 
@@ -32,13 +32,13 @@ let currentTasks = [];
 // --------------------------------------------------
 const cognitivismPieces = [
     // 행동주의 (3개)
-    { id: 'p1', name: '자극', category: '행동주의' },
-    { id: 'p2', name: '처벌', category: '행동주의' },
+    { id: 'p1', name: '외적 보상', category: '행동주의' },
+    { id: 'p2', name: '강화와 처벌', category: '행동주의' },
     { id: 'p3', name: '토큰 경제', category: '행동주의' },
     
     // 인지주의 (3개)
-    { id: 'p4', name: '인출', category: '인지주의' }, 
-    { id: 'p5', name: '전이', category: '인지주의' }, 
+    { id: 'p4', name: '자가질문법', category: '인지주의' }, 
+    { id: 'p5', name: '청킹', category: '인지주의' }, 
     { id: 'p6', name: '자가질문법', category: '인지주의' },
     
     // 구성주의 (3개)
@@ -57,24 +57,24 @@ const constructivismScenarios = [
         choices: [
             { 
                 id: 1, 
-                scaffolding: "약한 비계", 
+                scaffolding: "약한 비계 - 최소한의 도움", 
                 prompt: "두 이론의 핵심 기능과 목표만 생각해볼까? 행동주의는 행동에 대한 변화, 인지주의는 사고의 변화라고 생각해봐.",
                 reaction: "아, 이제 알 것 같아! 행동주의는 외부에서 오는 보상으로 습관을 만드는 거고, 인지주의는 내가 지식을 정리해서 활용할 수 있다는 거구나! 스스로 깨닫게 해줘서 정말 고마워!",
                 reward: { badge: '최고 멘토 뱃지 : 자기주도성 촉진', points: 10 }
             },
             { 
                 id: 2, 
-                scaffolding: "중간 비계", 
+                scaffolding: "중간 비계 - 중간 수준의 도움", 
                 prompt: "행동주의는 강아지 훈련처럼 외적인 보상으로 행동을 유발하고, 인지주의는 자가질문법 등을 통해서 네가 지식을 정리하는 과정을 스스로 점검하고 조절하는 것이 중요해.",
                 reaction: "아! 그럼 행동주의는 외부에서 오는 보상, 인지주의는 내가 스스로를 되돌아보며 점검, 확인, 조절하는 거라는 거지? 덕분에 이해했어!",
-                reward: { badge: '유능한 멘토 뱃지 : 적정 수준의 개입', points: 7 }
+                reward: { badge: '최고 멘토 뱃지 : 공동으로 문제를 해결하는 중간 수준의 도움을 제공', points: 10 }
             },
             { 
                 id: 3, 
-                scaffolding: "강한 비계", 
+                scaffolding: "강한 비계 - 직접적이고 구체적인 도움", 
                 prompt: "행동주의는 '자극과 반응'의 연결을 학습이라고 보는 거야. 인지주의는 '초인지(메타인지)'랑 '자가질문법' 등을 활용해 배운 내용에 대해 정답을 인출하고 문제해결에 활용하는거야.",
                 reaction: "아, 이제 알았어! 행동주의는 보상에 대한 의욕인 거고, 인지주의에서는 내 머릿 속 정보를 꺼내 활용하는 데 있구나! 직접적으로 알려줘서 고마원~",
-                reward: { badge: '도움의 손길 뱃지 : 문제에 대한 직접적이며 즉시 해결', points: 5 }
+                reward: { badge: '최고 멘토 뱃지 : 직접적이고 구체적인 도움을 제공', points: 10 }
             }
         ]
     }
