@@ -32,7 +32,7 @@ let currentTasks = [];
 // --------------------------------------------------
 const cognitivismPieces = [
     // 행동주의 (3개)
-    { id: 'p1', name: '외적 보상', category: '행동주의' },
+    { id: 'p1', name: '자극과 반응', category: '행동주의' },
     { id: 'p2', name: '강화와 처벌', category: '행동주의' },
     { id: 'p3', name: '토큰 경제', category: '행동주의' },
     
@@ -60,7 +60,7 @@ const constructivismScenarios = [
                 scaffolding: "약한 비계 - 최소한의 도움", 
                 prompt: "두 이론의 핵심 기능과 목표만 생각해볼까? 행동주의는 행동에 대한 변화, 인지주의는 사고의 변화라고 생각해봐.",
                 reaction: "아, 이제 알 것 같아! 행동주의는 외부에서 오는 보상으로 습관을 만드는 거고, 인지주의는 내가 지식을 정리해서 활용할 수 있다는 거구나! 스스로 깨닫게 해줘서 정말 고마워!",
-                reward: { badge: '최고 멘토 뱃지 : 자기주도성 촉진', points: 10 }
+                reward: { badge: '최고 멘토 뱃지 : 최소한의 도움으로 자기주도성 촉진', points: 10 }
             },
             { 
                 id: 2, 
