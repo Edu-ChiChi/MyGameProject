@@ -39,7 +39,7 @@ const cognitivismPieces = [
     // 인지주의 (3개)
     { id: 'p4', name: '자가질문법', category: '인지주의' }, 
     { id: 'p5', name: '청킹', category: '인지주의' }, 
-    { id: 'p6', name: '자가질문법', category: '인지주의' },
+    { id: 'p6', name: '시연', category: '인지주의' },
     
     // 구성주의 (3개)
     { id: 'p7', name: '비계', category: '구성주의' },
